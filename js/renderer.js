@@ -148,6 +148,15 @@ const Renderer = (function () {
                 ctx.font = '9px sans-serif';
                 ctx.textAlign = 'center';
                 ctx.fillText(I18n.t('statusSlowMo'), statusX + iconSize / 2, statusY + iconSize / 2 + 2);
+                statusX += 20;
+            }
+            if (player.isShiping) {
+                ctx.fillStyle = 'rgba(96, 125, 139, 0.8)';
+                ctx.fillRect(statusX, statusY, iconSize, iconSize);
+                ctx.fillStyle = '#FFF';
+                ctx.font = '9px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(I18n.t('statusShip'), statusX + iconSize / 2, statusY + iconSize / 2 + 2);
             }
         }
 
@@ -353,7 +362,8 @@ const Renderer = (function () {
             { icon: '🪙', name: I18n.t('itemCoin'), desc: I18n.t('itemCoinDesc') },
             { icon: '🧲', name: I18n.t('itemMagnet'), desc: I18n.t('itemMagnetDesc') },
             { icon: '⭐', name: I18n.t('itemDouble'), desc: I18n.t('itemDoubleDesc') },
-            { icon: '🪂', name: I18n.t('itemParachute'), desc: I18n.t('itemParachuteDesc') }
+            { icon: '🪂', name: I18n.t('itemParachute'), desc: I18n.t('itemParachuteDesc') },
+            { icon: '🛸', name: I18n.t('itemShip'), desc: I18n.t('itemShipDesc') }
         ];
 
         items.forEach((item, i) => {

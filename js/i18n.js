@@ -54,6 +54,8 @@ const I18n = (function () {
             itemDoubleDesc: '分数翻倍',
             itemParachute: '降落伞',
             itemParachuteDesc: '慢速下落',
+            itemShip: '飞船',
+            itemShipDesc: '无敌冲刺',
             monsterUfo: '飞碟',
             monsterUfoDesc: '左右飞行',
             monsterMonster: '怪物',
@@ -69,7 +71,10 @@ const I18n = (function () {
             ctrlLang: 'L : 切换语言',
             statusMagnet: '磁',
             statusDouble: '双',
-            statusParachute: '伞'
+            statusParachute: '伞',
+            statusShrink: '缩',
+            statusSlowMo: '缓',
+            statusShip: '船'
         },
         en: {
             gameTitle: 'SuperJump',
@@ -117,6 +122,8 @@ const I18n = (function () {
             itemDoubleDesc: 'Double pts',
             itemParachute: 'Chute',
             itemParachuteDesc: 'Slow fall',
+            itemShip: 'Ship',
+            itemShipDesc: 'Invincible fly',
             monsterUfo: 'UFO',
             monsterUfoDesc: 'Floats left/right',
             monsterMonster: 'Monster',
@@ -132,7 +139,10 @@ const I18n = (function () {
             ctrlLang: 'L : Language',
             statusMagnet: 'M',
             statusDouble: 'x2',
-            statusParachute: 'P'
+            statusParachute: 'P',
+            statusShrink: 'S',
+            statusSlowMo: 'SM',
+            statusShip: 'SH'
         }
     };
 

@@ -74,6 +74,9 @@ const Items = (function () {
                 case 'bomb':
                     drawBomb(ctx, cx, cy);
                     break;
+                case 'ship':
+                    drawShip(ctx, cx, cy);
+                    break;
             }
         }
     }
@@ -347,6 +350,45 @@ const Items = (function () {
         ctx.restore();
     }
 
+    // ─── 宇宙飞船道具 ───
+    function drawShip(ctx, cx, cy) {
+        ctx.save();
+        // 飞船主体
+        ctx.fillStyle = '#607D8B';
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, 9, 6, 0, 0, Math.PI * 2);
+        ctx.fill();
+        Utils.drawDoodleCircle(ctx, cx, cy, 9, '#455A64', 1.5, 2);
+        // 翅膀
+        ctx.fillStyle = '#90A4AE';
+        ctx.beginPath();
+        ctx.moveTo(cx - 8, cy + 3);
+        ctx.lineTo(cx - 14, cy + 10);
+        ctx.lineTo(cx - 4, cy + 8);
+        ctx.closePath();
+        ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(cx + 8, cy + 3);
+        ctx.lineTo(cx + 14, cy + 10);
+        ctx.lineTo(cx + 4, cy + 8);
+        ctx.closePath();
+        ctx.fill();
+        // 驾驶舱
+        ctx.fillStyle = '#81D4FA';
+        ctx.beginPath();
+        ctx.arc(cx, cy - 3, 3, 0, Math.PI * 2);
+        ctx.fill();
+        // 尾焰
+        ctx.fillStyle = '#FF9800';
+        ctx.beginPath();
+        ctx.moveTo(cx - 3, cy + 6);
+        ctx.lineTo(cx, cy + 12);
+        ctx.lineTo(cx + 3, cy + 6);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+    }
+
     // ─── 生成道具 ───
     function spawn(platforms) {
         items = [];
@@ -356,16 +398,17 @@ const Items = (function () {
             if (roll < 0.15) {
                 const typeRoll = Math.random();
                 let type;
-                if (typeRoll < 0.22) type = 'spring';
-                else if (typeRoll < 0.37) type = 'coin';
-                else if (typeRoll < 0.47) type = 'shield';
-                else if (typeRoll < 0.55) type = 'magnet';
-                else if (typeRoll < 0.62) type = 'double_score';
-                else if (typeRoll < 0.69) type = 'parachute';
-                else if (typeRoll < 0.75) type = 'super_spring';
-                else if (typeRoll < 0.81) type = 'shrink';
-                else if (typeRoll < 0.87) type = 'slow_mo';
-                else if (typeRoll < 0.93) type = 'bomb';
+                if (typeRoll < 0.20) type = 'spring';
+                else if (typeRoll < 0.35) type = 'coin';
+                else if (typeRoll < 0.44) type = 'shield';
+                else if (typeRoll < 0.52) type = 'magnet';
+                else if (typeRoll < 0.58) type = 'double_score';
+                else if (typeRoll < 0.64) type = 'parachute';
+                else if (typeRoll < 0.70) type = 'super_spring';
+                else if (typeRoll < 0.76) type = 'shrink';
+                else if (typeRoll < 0.82) type = 'slow_mo';
+                else if (typeRoll < 0.88) type = 'bomb';
+                else if (typeRoll < 0.94) type = 'ship';
                 else type = 'rocket';
 
                 items.push(new Item(
@@ -437,6 +480,9 @@ const Items = (function () {
                         Obstacles.clearAll();
                         Particles.emitBomb(player.x + player.width / 2, player.y + player.height / 2);
                         AudioManager.rocket();
+                        break;
+                    case 'ship':
+                        Player.activateShip();
                         break;
                 }
             }

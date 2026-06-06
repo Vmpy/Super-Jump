@@ -183,6 +183,33 @@ const Particles = (function () {
         }
     }
 
+    function emitShip(x, y) {
+        const count = 15;
+        for (let i = 0; i < count; i++) {
+            const angle = Utils.random(0, Math.PI * 2);
+            const speed = Utils.random(50, 150);
+            particles.push(new Particle(
+                x, y,
+                '#607D8B',
+                Utils.random(3, 6),
+                Math.cos(angle) * speed,
+                Math.sin(angle) * speed,
+                Utils.random(0.4, 0.8)
+            ));
+        }
+        for (let i = 0; i < 6; i++) {
+            particles.push(new Particle(
+                x + Utils.random(-5, 5),
+                y,
+                '#FF9800',
+                Utils.random(3, 6),
+                Utils.random(-30, 30),
+                Utils.random(100, 250),
+                Utils.random(0.3, 0.5)
+            ));
+        }
+    }
+
     function update(dt) {
         for (let i = particles.length - 1; i >= 0; i--) {
             particles[i].update(dt);
@@ -211,6 +238,7 @@ const Particles = (function () {
         emitTeleport,
         emitShrink,
         emitSlowMo,
+        emitShip,
         update,
         draw,
         clear

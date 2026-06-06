@@ -237,16 +237,17 @@ const Platforms = (function () {
         if (typeof Items !== 'undefined' && Math.random() < 0.15) {
             const typeRoll = Math.random();
             let itemType;
-            if (typeRoll < 0.22) itemType = 'spring';
-            else if (typeRoll < 0.37) itemType = 'coin';
-            else if (typeRoll < 0.47) itemType = 'shield';
-            else if (typeRoll < 0.55) itemType = 'magnet';
-            else if (typeRoll < 0.62) itemType = 'double_score';
-            else if (typeRoll < 0.69) itemType = 'parachute';
-            else if (typeRoll < 0.75) itemType = 'super_spring';
-            else if (typeRoll < 0.81) itemType = 'shrink';
-            else if (typeRoll < 0.87) itemType = 'slow_mo';
-            else if (typeRoll < 0.93) itemType = 'bomb';
+            if (typeRoll < 0.20) itemType = 'spring';
+            else if (typeRoll < 0.35) itemType = 'coin';
+            else if (typeRoll < 0.44) itemType = 'shield';
+            else if (typeRoll < 0.52) itemType = 'magnet';
+            else if (typeRoll < 0.58) itemType = 'double_score';
+            else if (typeRoll < 0.64) itemType = 'parachute';
+            else if (typeRoll < 0.70) itemType = 'super_spring';
+            else if (typeRoll < 0.76) itemType = 'shrink';
+            else if (typeRoll < 0.82) itemType = 'slow_mo';
+            else if (typeRoll < 0.88) itemType = 'bomb';
+            else if (typeRoll < 0.94) itemType = 'ship';
             else itemType = 'rocket';
             Items.addItem(x + PLATFORM_WIDTH / 2 - 10, y - 25, itemType, p);
         }

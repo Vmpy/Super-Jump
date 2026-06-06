@@ -15,6 +15,8 @@ const Player = (function () {
     const PARACHUTE_FALL_SPEED = 250; // 降落伞时下落速度
     const ROCKET_DURATION = 2.0;   // 火箭持续时间（秒）
     const ROCKET_SPEED = -600;     // 火箭上升速度
+    const SHIP_DURATION = 5.0;   // 飞船持续时间（秒）
+    const SHIP_SPEED = -500;       // 飞船上升速度
     const MAGNET_DURATION = 6.0;   // 磁铁持续时间
     const DOUBLE_SCORE_DURATION = 8.0; // 双倍分数持续时间
     const PARACHUTE_DURATION = 5.0;  // 降落伞持续时间
@@ -39,6 +41,8 @@ const Player = (function () {
             hasShield: false,
             isRocketing: false,
             rocketTimer: 0,
+            isShiping: false,
+            shipTimer: 0,
             // 持续道具状态
             magnetTimer: 0,
             doubleScoreTimer: 0,
@@ -126,7 +130,15 @@ const Player = (function () {
         }
 
         // ─── 垂直运动 ───
-        if (player.isRocketing) {
+        if (player.isShiping) {
+            // 飞船模式：无视重力，直线上升，无敌
+            player.vy = SHIP_SPEED;
+            player.shipTimer -= dt;
+            if (player.shipTimer <= 0) {
+                player.isShiping = false;
+                player.vy = BASE_JUMP_VELOCITY * 0.8;
+            }
+        } else if (player.isRocketing) {
             // 火箭模式：无视重力，直线上升
             player.vy = ROCKET_SPEED;
             player.rocketTimer -= dt;
@@ -182,6 +194,15 @@ const Player = (function () {
         player.isRocketing = true;
         player.rocketTimer = ROCKET_DURATION;
         AudioManager.rocket();
+    }
+
+    // ─── 激活飞船 ───
+    function activateShip() {
+        if (!player) return;
+        player.isShiping = true;
+        player.shipTimer = SHIP_DURATION;
+        AudioManager.rocket();
+        Particles.emitShip(player.x + player.width / 2, player.y + player.height);
     }
 
     // ─── 激活护盾 ───
@@ -246,6 +267,9 @@ const Player = (function () {
     // ─── 受伤 ───
     function takeDamage() {
         if (!player) return;
+        if (player.isShiping) {
+            return false; // 飞船期间无敌
+        }
         if (player.hasShield) {
             player.hasShield = false;
             AudioManager.collectItem(); // 护盾破裂音效
@@ -296,6 +320,45 @@ const Player = (function () {
                 ctx.fillRect(fx - fsize / 2, fy - fsize / 2, fsize, fsize);
             }
         }
+
+        // 绘制飞船状态
+        if (player.isShiping) {
+            // 飞船外壳
+            ctx.save();
+            ctx.fillStyle = '#607D8B';
+            ctx.beginPath();
+            ctx.ellipse(player.x + player.width / 2, screenY + player.height / 2 - 5, player.width * 0.7, player.height * 0.5, 0, 0, Math.PI * 2);
+            ctx.fill();
+            // 飞船翅膀
+            ctx.fillStyle = '#90A4AE';
+            ctx.beginPath();
+            ctx.moveTo(player.x + player.width / 2 - 10, screenY + player.height / 2 + 5);
+            ctx.lineTo(player.x + player.width / 2 - 18, screenY + player.height / 2 + 15);
+            ctx.lineTo(player.x + player.width / 2 - 5, screenY + player.height / 2 + 10);
+            ctx.closePath();
+            ctx.fill();
+            ctx.beginPath();
+            ctx.moveTo(player.x + player.width / 2 + 10, screenY + player.height / 2 + 5);
+            ctx.lineTo(player.x + player.width / 2 + 18, screenY + player.height / 2 + 15);
+            ctx.lineTo(player.x + player.width / 2 + 5, screenY + player.height / 2 + 10);
+            ctx.closePath();
+            ctx.fill();
+            // 驾驶舱
+            ctx.fillStyle = '#81D4FA';
+            ctx.beginPath();
+            ctx.arc(player.x + player.width / 2, screenY + player.height / 2 - 8, 4, 0, Math.PI * 2);
+            ctx.fill();
+            // 飞船尾焰
+            const flameCount = 5;
+            for (let i = 0; i < flameCount; i++) {
+                const fx = player.x + player.width / 2 + Utils.random(-6, 6);
+                const fy = screenY + player.height + Utils.random(5, 25);
+                const fsize = Utils.random(3, 9);
+                ctx.fillStyle = Utils.randomInt(0, 1) ? '#FF5722' : '#FFEB3B';
+                ctx.fillRect(fx - fsize / 2, fy - fsize / 2, fsize, fsize);
+            }
+            ctx.restore();
+        }
     }
 
     return {
@@ -305,6 +368,7 @@ const Player = (function () {
         update,
         jump,
         activateRocket,
+        activateShip,
         activateShield,
         activateMagnet,
         activateDoubleScore,
