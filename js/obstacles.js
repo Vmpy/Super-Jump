@@ -328,11 +328,22 @@ const Obstacles = (function () {
         bullets = [];
     }
 
+    function clearAll() {
+        for (const o of obstacles) {
+            if (o.alive) {
+                o.alive = false;
+                Particles.emitBreak(o.x + o.width / 2, o.y + o.height / 2, o.width, '#546E7A');
+            }
+        }
+        bullets = [];
+    }
+
     return {
         spawn,
         update,
         checkCollisions,
         draw,
-        clear
+        clear,
+        clearAll
     };
 })();

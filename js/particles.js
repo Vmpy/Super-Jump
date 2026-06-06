@@ -107,6 +107,82 @@ const Particles = (function () {
         }
     }
 
+    function emitBomb(x, y) {
+        const count = 20;
+        for (let i = 0; i < count; i++) {
+            const angle = (i / count) * Math.PI * 2;
+            const speed = Utils.random(100, 300);
+            particles.push(new Particle(
+                x, y,
+                '#FF5722',
+                Utils.random(4, 8),
+                Math.cos(angle) * speed,
+                Math.sin(angle) * speed,
+                Utils.random(0.4, 0.8)
+            ));
+        }
+        for (let i = 0; i < 8; i++) {
+            const angle = Utils.random(0, Math.PI * 2);
+            const speed = Utils.random(50, 150);
+            particles.push(new Particle(
+                x, y,
+                '#FFFFFF',
+                Utils.random(2, 5),
+                Math.cos(angle) * speed,
+                Math.sin(angle) * speed,
+                Utils.random(0.3, 0.6)
+            ));
+        }
+    }
+
+    function emitTeleport(x, y) {
+        const count = 15;
+        for (let i = 0; i < count; i++) {
+            const angle = Utils.random(0, Math.PI * 2);
+            const speed = Utils.random(50, 200);
+            particles.push(new Particle(
+                x, y,
+                '#00BCD4',
+                Utils.random(2, 5),
+                Math.cos(angle) * speed,
+                Math.sin(angle) * speed,
+                Utils.random(0.3, 0.6)
+            ));
+        }
+    }
+
+    function emitShrink(x, y) {
+        const count = 10;
+        for (let i = 0; i < count; i++) {
+            const angle = Utils.random(0, Math.PI * 2);
+            const speed = Utils.random(30, 100);
+            particles.push(new Particle(
+                x, y,
+                '#9C27B0',
+                Utils.random(2, 4),
+                Math.cos(angle) * speed,
+                Math.sin(angle) * speed,
+                Utils.random(0.3, 0.5)
+            ));
+        }
+    }
+
+    function emitSlowMo(x, y) {
+        const count = 10;
+        for (let i = 0; i < count; i++) {
+            const angle = Utils.random(0, Math.PI * 2);
+            const speed = Utils.random(30, 80);
+            particles.push(new Particle(
+                x, y,
+                '#00BCD4',
+                Utils.random(2, 4),
+                Math.cos(angle) * speed,
+                Math.sin(angle) * speed,
+                Utils.random(0.3, 0.5)
+            ));
+        }
+    }
+
     function update(dt) {
         for (let i = particles.length - 1; i >= 0; i--) {
             particles[i].update(dt);
@@ -131,6 +207,10 @@ const Particles = (function () {
         emitCollect,
         emitJump,
         emitSpring,
+        emitBomb,
+        emitTeleport,
+        emitShrink,
+        emitSlowMo,
         update,
         draw,
         clear

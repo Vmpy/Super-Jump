@@ -10,7 +10,7 @@ const Items = (function () {
     const BONUS_SCORE = 50;
 
     class Item {
-        constructor(x, y, type) {
+        constructor(x, y, type, platform = null) {
             this.x = x;
             this.y = y;
             this.width = ITEM_SIZE;
@@ -19,10 +19,17 @@ const Items = (function () {
             this.alive = true;
             this.bobOffset = 0;
             this.bobSpeed = 3;
+            // 绑定平台（移动平台上的道具需要跟随）
+            this.platform = platform;
+            this.platformOffset = platform ? (x - (platform.x + platform.width / 2)) : 0;
         }
 
         update(dt) {
             this.bobOffset += this.bobSpeed * dt;
+            // 跟随平台移动
+            if (this.platform && this.platform.alive) {
+                this.x = this.platform.x + this.platform.width / 2 + this.platformOffset;
+            }
         }
 
         draw(ctx, camera) {
@@ -54,6 +61,18 @@ const Items = (function () {
                     break;
                 case 'parachute':
                     drawParachute(ctx, cx, cy);
+                    break;
+                case 'super_spring':
+                    drawSuperSpring(ctx, cx, cy);
+                    break;
+                case 'shrink':
+                    drawShrink(ctx, cx, cy);
+                    break;
+                case 'slow_mo':
+                    drawSlowMo(ctx, cx, cy);
+                    break;
+                case 'bomb':
+                    drawBomb(ctx, cx, cy);
                     break;
             }
         }
@@ -236,6 +255,98 @@ const Items = (function () {
         ctx.restore();
     }
 
+    // ─── 超级弹簧 ───
+    function drawSuperSpring(ctx, cx, cy) {
+        ctx.save();
+        ctx.strokeStyle = '#F44336';
+        ctx.lineWidth = 4;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        const coils = 4;
+        const coilH = 18;
+        for (let i = 0; i <= coils * 4; i++) {
+            const t = i / (coils * 4);
+            const x = cx + Math.sin(t * Math.PI * coils * 2) * 6;
+            const y = cy - coilH / 2 + t * coilH;
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+        ctx.restore();
+    }
+
+    // ─── 缩小道具 ───
+    function drawShrink(ctx, cx, cy) {
+        ctx.save();
+        ctx.fillStyle = '#9C27B0';
+        ctx.beginPath();
+        ctx.arc(cx, cy, 9, 0, Math.PI * 2);
+        ctx.fill();
+        Utils.drawDoodleCircle(ctx, cx, cy, 9, '#7B1FA2', 2, 2);
+        // 向内箭头
+        ctx.strokeStyle = '#FFF';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(cx - 4, cy - 4);
+        ctx.lineTo(cx, cy);
+        ctx.lineTo(cx + 4, cy - 4);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(cx - 4, cy + 4);
+        ctx.lineTo(cx, cy);
+        ctx.lineTo(cx + 4, cy + 4);
+        ctx.stroke();
+        ctx.restore();
+    }
+
+    // ─── 时间缓速道具 ───
+    function drawSlowMo(ctx, cx, cy) {
+        ctx.save();
+        ctx.fillStyle = '#00BCD4';
+        ctx.beginPath();
+        ctx.arc(cx, cy, 9, 0, Math.PI * 2);
+        ctx.fill();
+        Utils.drawDoodleCircle(ctx, cx, cy, 9, '#00838F', 2, 2);
+        // 时钟指针
+        ctx.strokeStyle = '#FFF';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy - 4);
+        ctx.lineTo(cx, cy);
+        ctx.lineTo(cx + 3, cy + 2);
+        ctx.stroke();
+        ctx.fillStyle = '#FFF';
+        ctx.font = 'bold 7px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('0.5x', cx, cy + 6);
+        ctx.restore();
+    }
+
+    // ─── 炸弹道具 ───
+    function drawBomb(ctx, cx, cy) {
+        ctx.save();
+        // 炸弹主体
+        ctx.fillStyle = '#212121';
+        ctx.beginPath();
+        ctx.arc(cx, cy + 1, 8, 0, Math.PI * 2);
+        ctx.fill();
+        Utils.drawDoodleCircle(ctx, cx, cy + 1, 8, '#424242', 2, 2);
+        // 引线
+        ctx.strokeStyle = '#FF9800';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy - 7);
+        ctx.lineTo(cx + 3, cy - 12);
+        ctx.stroke();
+        // 火花
+        ctx.fillStyle = '#FFEB3B';
+        ctx.beginPath();
+        ctx.arc(cx + 3, cy - 12, 2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+    }
+
     // ─── 生成道具 ───
     function spawn(platforms) {
         items = [];
@@ -245,23 +356,31 @@ const Items = (function () {
             if (roll < 0.15) {
                 const typeRoll = Math.random();
                 let type;
-                if (typeRoll < 0.5) type = 'spring';
-                else if (typeRoll < 0.7) type = 'coin';
-                else if (typeRoll < 0.85) type = 'shield';
+                if (typeRoll < 0.22) type = 'spring';
+                else if (typeRoll < 0.37) type = 'coin';
+                else if (typeRoll < 0.47) type = 'shield';
+                else if (typeRoll < 0.55) type = 'magnet';
+                else if (typeRoll < 0.62) type = 'double_score';
+                else if (typeRoll < 0.69) type = 'parachute';
+                else if (typeRoll < 0.75) type = 'super_spring';
+                else if (typeRoll < 0.81) type = 'shrink';
+                else if (typeRoll < 0.87) type = 'slow_mo';
+                else if (typeRoll < 0.93) type = 'bomb';
                 else type = 'rocket';
 
                 items.push(new Item(
                     p.x + p.width / 2 - ITEM_SIZE / 2,
                     p.y - ITEM_SIZE - 5,
-                    type
+                    type,
+                    p
                 ));
             }
         }
     }
 
     // ─── 添加新道具（动态生成时） ───
-    function addItem(x, y, type) {
-        items.push(new Item(x, y, type));
+    function addItem(x, y, type, platform = null) {
+        items.push(new Item(x, y, type, platform));
     }
 
     // ─── 更新 ───
@@ -304,6 +423,20 @@ const Items = (function () {
                     case 'parachute':
                         Player.activateParachute();
                         Particles.emitCollect(item.x, item.y, '#4FC3F7');
+                        break;
+                    case 'super_spring':
+                        Player.jump('super_spring');
+                        break;
+                    case 'shrink':
+                        Player.activateShrink();
+                        break;
+                    case 'slow_mo':
+                        Player.activateSlowMo();
+                        break;
+                    case 'bomb':
+                        Obstacles.clearAll();
+                        Particles.emitBomb(player.x + player.width / 2, player.y + player.height / 2);
+                        AudioManager.rocket();
                         break;
                 }
             }

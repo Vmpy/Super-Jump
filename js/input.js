@@ -35,9 +35,24 @@ const Input = (function () {
     // 防止连续触发的按键（如空格、P）
     const keyPressedThisFrame = {};
 
-    function init() {
+    // 鼠标状态
+    let canvas = null;
+    let logicalWidth = 400;
+    let mouseX = 0;
+    let mouseLeft = false;
+
+    function init(canvasElement, lWidth) {
+        canvas = canvasElement;
+        logicalWidth = lWidth;
+
         window.addEventListener('keydown', onKeyDown);
         window.addEventListener('keyup', onKeyUp);
+
+        // 鼠标事件
+        canvas.addEventListener('mousedown', onMouseDown);
+        canvas.addEventListener('mouseup', onMouseUp);
+        canvas.addEventListener('mousemove', onMouseMove);
+        canvas.addEventListener('contextmenu', (e) => e.preventDefault());
 
         // 阻止方向键滚动页面
         window.addEventListener('keydown', (e) => {
@@ -62,6 +77,31 @@ const Input = (function () {
         }
     }
 
+    // 鼠标事件
+    function onMouseDown(e) {
+        if (e.button === 0) {
+            mouseLeft = true;
+            updateMousePos(e);
+        }
+    }
+
+    function onMouseUp(e) {
+        if (e.button === 0) {
+            mouseLeft = false;
+        }
+    }
+
+    function onMouseMove(e) {
+        updateMousePos(e);
+    }
+
+    function updateMousePos(e) {
+        if (!canvas) return;
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = logicalWidth / rect.width;
+        mouseX = (e.clientX - rect.left) * scaleX;
+    }
+
     // 检查某按键是否在本帧被按下（用于单次触发）
     function isPressed(action) {
         if (keyPressedThisFrame[action]) {
@@ -76,6 +116,16 @@ const Input = (function () {
         return keys[action] === true;
     }
 
+    // 鼠标左键是否按住
+    function isMouseDown() {
+        return mouseLeft;
+    }
+
+    // 获取鼠标逻辑坐标 X
+    function getMouseX() {
+        return mouseX;
+    }
+
     // 清理本帧按键状态（每帧结束时调用）
     function clearFrame() {
         for (const key in keyPressedThisFrame) {
@@ -87,6 +137,8 @@ const Input = (function () {
         init,
         isPressed,
         isDown,
+        isMouseDown,
+        getMouseX,
         clearFrame,
         keys
     };

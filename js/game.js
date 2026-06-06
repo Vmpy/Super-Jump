@@ -42,7 +42,7 @@ const Game = (function () {
         Renderer.init(canvas, LOGICAL_WIDTH, LOGICAL_HEIGHT);
 
         // 初始化输入
-        Input.init();
+        Input.init(canvas, LOGICAL_WIDTH);
 
         // 初始化音频（在用户交互后才能真正初始化，这里先标记）
         document.addEventListener('keydown', firstInteraction);
@@ -118,7 +118,13 @@ const Game = (function () {
         lastTimestamp = timestamp;
 
         // 限制 dt 防止过大跳跃（如切换标签页回来）
-        const dt = Math.min(rawDt, 0.05);
+        let dt = Math.min(rawDt, 0.05);
+
+        // 时间缓速效果
+        const player = Player.get();
+        if (player && player.slowMoTimer > 0) {
+            dt *= 0.5;
+        }
 
         update(dt);
         render();
@@ -188,7 +194,7 @@ const Game = (function () {
         Platforms.update(dt, LOGICAL_WIDTH, LOGICAL_HEIGHT);
 
         // 平台碰撞
-        Platforms.checkCollisions();
+        Platforms.checkCollisions(LOGICAL_WIDTH);
 
         // 更新道具
         Items.update(dt);

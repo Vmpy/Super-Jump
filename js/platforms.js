@@ -113,6 +113,14 @@ const Platforms = (function () {
                     fillColor = '#F06292';
                     strokeColor = '#C2185B';
                     break;
+                case 'sticky':
+                    fillColor = '#8BC34A';
+                    strokeColor = '#558B2F';
+                    break;
+                case 'teleport':
+                    fillColor = '#00BCD4';
+                    strokeColor = '#00838F';
+                    break;
                 default:
                     fillColor = '#4CAF50';
                     strokeColor = '#2E7D32';
@@ -144,6 +152,24 @@ const Platforms = (function () {
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillText('◷', this.x + this.width / 2, screenY + this.height / 2 + 1);
+            }
+
+            // 粘液平台画个波浪标记
+            if (this.type === 'sticky') {
+                ctx.fillStyle = '#FFF';
+                ctx.font = 'bold 10px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('≈', this.x + this.width / 2, screenY + this.height / 2 + 1);
+            }
+
+            // 传送平台画个星形标记
+            if (this.type === 'teleport') {
+                ctx.fillStyle = '#FFF';
+                ctx.font = 'bold 10px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('✦', this.x + this.width / 2, screenY + this.height / 2 + 1);
             }
         }
     }
@@ -191,31 +217,38 @@ const Platforms = (function () {
         const gap = BASE_GAP + difficulty * (MAX_GAP - BASE_GAP);
         const y = highestPlatformY - gap;
 
-        // 随机类型（5种平台）
+        // 随机类型（7种平台）
         const typeItem = Utils.weightedRandom([
-            { type: 'normal', weight: Math.max(0.25, 0.6 - difficulty * 0.2) },
-            { type: 'moving', weight: Math.min(0.3, 0.2 + difficulty * 0.12) },
-            { type: 'breakable', weight: Math.min(0.25, 0.1 + difficulty * 0.12) },
+            { type: 'normal', weight: Math.max(0.2, 0.6 - difficulty * 0.2) },
+            { type: 'moving', weight: Math.min(0.25, 0.2 + difficulty * 0.1) },
+            { type: 'breakable', weight: Math.min(0.2, 0.1 + difficulty * 0.1) },
             { type: 'vanishing', weight: Math.min(0.15, 0.05 + difficulty * 0.08) },
-            { type: 'bouncy', weight: 0.08 }
+            { type: 'bouncy', weight: 0.08 },
+            { type: 'sticky', weight: Math.min(0.15, 0.05 + difficulty * 0.08) },
+            { type: 'teleport', weight: Math.min(0.1, 0.03 + difficulty * 0.05) }
         ]);
 
         const x = Utils.randomInt(20, canvasWidth - PLATFORM_WIDTH - 20);
-        platforms.push(new Platform(x, y, typeItem.type));
+        const p = new Platform(x, y, typeItem.type);
+        platforms.push(p);
         highestPlatformY = y;
 
         // 随机生成道具（只在运行时调用，此时 Items 已加载）
         if (typeof Items !== 'undefined' && Math.random() < 0.15) {
             const typeRoll = Math.random();
             let itemType;
-            if (typeRoll < 0.25) itemType = 'spring';
-            else if (typeRoll < 0.45) itemType = 'coin';
-            else if (typeRoll < 0.55) itemType = 'shield';
-            else if (typeRoll < 0.65) itemType = 'magnet';
-            else if (typeRoll < 0.75) itemType = 'double_score';
-            else if (typeRoll < 0.85) itemType = 'parachute';
+            if (typeRoll < 0.22) itemType = 'spring';
+            else if (typeRoll < 0.37) itemType = 'coin';
+            else if (typeRoll < 0.47) itemType = 'shield';
+            else if (typeRoll < 0.55) itemType = 'magnet';
+            else if (typeRoll < 0.62) itemType = 'double_score';
+            else if (typeRoll < 0.69) itemType = 'parachute';
+            else if (typeRoll < 0.75) itemType = 'super_spring';
+            else if (typeRoll < 0.81) itemType = 'shrink';
+            else if (typeRoll < 0.87) itemType = 'slow_mo';
+            else if (typeRoll < 0.93) itemType = 'bomb';
             else itemType = 'rocket';
-            Items.addItem(x + PLATFORM_WIDTH / 2 - 10, y - 25, itemType);
+            Items.addItem(x + PLATFORM_WIDTH / 2 - 10, y - 25, itemType, p);
         }
     }
 
@@ -241,7 +274,7 @@ const Platforms = (function () {
     }
 
     // ─── 碰撞检测 ───
-    function checkCollisions() {
+    function checkCollisions(canvasWidth) {
         const player = Player.get();
         if (!player || !player.alive) return;
 
@@ -265,6 +298,17 @@ const Platforms = (function () {
                     p.break();
                     player.y = p.y - player.height;
                     player.vy = 0;
+                    Player.jump('normal');
+                } else if (p.type === 'sticky') {
+                    if (player.stickyTimer <= 0) {
+                        player.y = p.y - player.height;
+                        player.vy = 0;
+                        player.stickyTimer = 0.5;
+                    }
+                } else if (p.type === 'teleport') {
+                    player.y = p.y - player.height;
+                    player.vy = 0;
+                    Player.teleport(canvasWidth);
                     Player.jump('normal');
                 } else {
                     player.y = p.y - player.height;

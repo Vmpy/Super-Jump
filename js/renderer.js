@@ -130,6 +130,24 @@ const Renderer = (function () {
                 ctx.font = '9px sans-serif';
                 ctx.textAlign = 'center';
                 ctx.fillText(I18n.t('statusParachute'), statusX + iconSize / 2, statusY + iconSize / 2 + 2);
+                statusX += 20;
+            }
+            if (player.shrinkTimer > 0) {
+                ctx.fillStyle = 'rgba(156, 39, 176, 0.8)';
+                ctx.fillRect(statusX, statusY, iconSize, iconSize);
+                ctx.fillStyle = '#FFF';
+                ctx.font = '9px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(I18n.t('statusShrink'), statusX + iconSize / 2, statusY + iconSize / 2 + 2);
+                statusX += 20;
+            }
+            if (player.slowMoTimer > 0) {
+                ctx.fillStyle = 'rgba(0, 188, 212, 0.8)';
+                ctx.fillRect(statusX, statusY, iconSize, iconSize);
+                ctx.fillStyle = '#FFF';
+                ctx.font = '9px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(I18n.t('statusSlowMo'), statusX + iconSize / 2, statusY + iconSize / 2 + 2);
             }
         }
 

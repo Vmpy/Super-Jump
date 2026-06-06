@@ -19,6 +19,9 @@ const Player = (function () {
     const DOUBLE_SCORE_DURATION = 8.0; // 双倍分数持续时间
     const PARACHUTE_DURATION = 5.0;  // 降落伞持续时间
     const MAGNET_RANGE = 80;       // 磁铁吸附范围
+    const SUPER_SPRING_JUMP_VELOCITY = -1200; // 超级弹簧跳跃速度
+    const SHRINK_DURATION = 5.0;   // 缩小持续时间
+    const SLOW_MO_DURATION = 3.0;  // 时间缓速持续时间
 
     let player = null;
 
@@ -40,6 +43,10 @@ const Player = (function () {
             magnetTimer: 0,
             doubleScoreTimer: 0,
             parachuteTimer: 0,
+            shrinkTimer: 0,
+            slowMoTimer: 0,
+            // 状态计时
+            stickyTimer: 0,
             score: 0,
             maxHeight: 0,
             alive: true
@@ -66,6 +73,27 @@ const Player = (function () {
         if (player.magnetTimer > 0) player.magnetTimer -= dt;
         if (player.doubleScoreTimer > 0) player.doubleScoreTimer -= dt;
         if (player.parachuteTimer > 0) player.parachuteTimer -= dt;
+        if (player.slowMoTimer > 0) player.slowMoTimer -= dt;
+        if (player.shrinkTimer > 0) {
+            player.shrinkTimer -= dt;
+            if (player.shrinkTimer <= 0) {
+                // 恢复大小，保持脚底位置
+                player.y -= (PLAYER_HEIGHT - player.height);
+                player.width = PLAYER_WIDTH;
+                player.height = PLAYER_HEIGHT;
+            }
+        }
+
+        // 粘住状态：完全不能移动
+        if (player.stickyTimer > 0) {
+            player.stickyTimer -= dt;
+            player.vx = 0;
+            player.vy = 0;
+            if (player.stickyTimer <= 0) {
+                jump('normal');
+            }
+            return;
+        }
 
         // ─── 水平移动 ───
         if (Input.isDown('left')) {
@@ -74,6 +102,16 @@ const Player = (function () {
         } else if (Input.isDown('right')) {
             player.vx = MOVE_SPEED;
             player.facingRight = true;
+        } else if (Input.isMouseDown()) {
+            const mouseX = Input.getMouseX();
+            const playerCenterX = player.x + player.width / 2;
+            if (mouseX < playerCenterX) {
+                player.vx = -MOVE_SPEED;
+                player.facingRight = false;
+            } else {
+                player.vx = MOVE_SPEED;
+                player.facingRight = true;
+            }
         } else {
             player.vx = 0;
         }
@@ -127,6 +165,10 @@ const Player = (function () {
             player.vy = SPRING_JUMP_VELOCITY;
             AudioManager.springJump();
             Particles.emitSpring(player.x + player.width / 2, player.y + player.height);
+        } else if (type === 'super_spring') {
+            player.vy = SUPER_SPRING_JUMP_VELOCITY;
+            AudioManager.springJump();
+            Particles.emitSpring(player.x + player.width / 2, player.y + player.height);
         } else {
             player.vy = BASE_JUMP_VELOCITY;
             AudioManager.jump();
@@ -166,6 +208,33 @@ const Player = (function () {
     function activateParachute() {
         if (!player) return;
         player.parachuteTimer = PARACHUTE_DURATION;
+        AudioManager.collectItem();
+    }
+
+    // ─── 激活缩小 ───
+    function activateShrink() {
+        if (!player) return;
+        player.shrinkTimer = SHRINK_DURATION;
+        player.width = PLAYER_WIDTH * 0.5;
+        player.height = PLAYER_HEIGHT * 0.5;
+        player.y += (PLAYER_HEIGHT - player.height); // 保持脚底位置
+        AudioManager.collectItem();
+        Particles.emitShrink(player.x + player.width / 2, player.y + player.height / 2);
+    }
+
+    // ─── 激活时间缓速 ───
+    function activateSlowMo() {
+        if (!player) return;
+        player.slowMoTimer = SLOW_MO_DURATION;
+        AudioManager.collectItem();
+        Particles.emitSlowMo(player.x + player.width / 2, player.y + player.height / 2);
+    }
+
+    // ─── 传送 ───
+    function teleport(canvasWidth) {
+        if (!player) return;
+        player.x = Utils.randomInt(20, canvasWidth - player.width - 20);
+        Particles.emitTeleport(player.x + player.width / 2, player.y + player.height / 2);
         AudioManager.collectItem();
     }
 
@@ -240,6 +309,9 @@ const Player = (function () {
         activateMagnet,
         activateDoubleScore,
         activateParachute,
+        activateShrink,
+        activateSlowMo,
+        teleport,
         takeDamage,
         addScore,
         getMagnetRange,
