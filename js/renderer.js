@@ -303,36 +303,87 @@ const Renderer = (function () {
         ctx.restore();
     }
 
+    let tutorialPage = 0;
+    const TUTORIAL_PAGES = 2;
+
+    function setTutorialPage(page) {
+        tutorialPage = page;
+    }
+
+    function getTutorialPage() {
+        return tutorialPage;
+    }
+
+    function nextTutorialPage() {
+        tutorialPage = (tutorialPage + 1) % TUTORIAL_PAGES;
+    }
+
+    function prevTutorialPage() {
+        tutorialPage = (tutorialPage - 1 + TUTORIAL_PAGES) % TUTORIAL_PAGES;
+    }
+
     // ─── 绘制说明页面 ───
     function drawTutorial() {
         if (!ctx) return;
 
         ctx.save();
 
-        // 背景
         ctx.fillStyle = '#FDFBF7';
         ctx.fillRect(0, 0, logicalWidth, logicalHeight);
         Background.draw(ctx, { x: 0, y: 0, screenWidth: logicalWidth, screenHeight: logicalHeight });
 
-        // 标题
         ctx.fillStyle = '#333';
-        ctx.font = 'bold 28px "Comic Sans MS", sans-serif';
+        ctx.font = 'bold 24px "Comic Sans MS", sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'top';
-        ctx.fillText(I18n.t('howToPlay'), logicalWidth / 2, 20);
-        Utils.drawDoodleLine(ctx, 100, 52, logicalWidth - 100, 52, '#333', 2, 3);
+        ctx.fillText(I18n.t('howToPlay'), logicalWidth / 2, 10);
+        Utils.drawDoodleLine(ctx, 100, 38, logicalWidth - 100, 38, '#333', 2, 3);
 
-        const col1X = 70;
-        const col2X = 200;
-        const col3X = 330;
-        const startY = 75;
-        const lineH = 40;
+        if (tutorialPage === 0) {
+            drawTutorialPlatforms();
+        } else {
+            drawTutorialItemsMonsters();
+        }
 
-        // ─── 列1：平台 ───
+        // 页码指示器
         ctx.textAlign = 'center';
-        ctx.font = 'bold 14px "Comic Sans MS", sans-serif';
+        ctx.textBaseline = 'middle';
+        for (let i = 0; i < TUTORIAL_PAGES; i++) {
+            const dotX = logicalWidth / 2 - (TUTORIAL_PAGES - 1) * 12 + i * 24;
+            const dotY = logicalHeight - 40;
+            ctx.beginPath();
+            if (i === tutorialPage) {
+                ctx.fillStyle = '#333';
+                ctx.arc(dotX, dotY, 5, 0, Math.PI * 2);
+            } else {
+                ctx.fillStyle = '#CCC';
+                ctx.arc(dotX, dotY, 4, 0, Math.PI * 2);
+            }
+            ctx.fill();
+        }
+
+        // 翻页提示
+        ctx.fillStyle = '#999';
+        ctx.font = '11px "Comic Sans MS", sans-serif';
+        ctx.fillText(I18n.t('tutorialNav'), logicalWidth / 2, logicalHeight - 22);
+
+        // 返回提示
+        ctx.fillStyle = '#2196F3';
+        ctx.font = 'bold 13px "Comic Sans MS", sans-serif';
+        ctx.fillText(I18n.t('pressToGoBack'), logicalWidth / 2, logicalHeight - 6);
+
+        ctx.restore();
+    }
+
+    function drawTutorialPlatforms() {
+        const startY = 56;
+        const lineH = 34;
+
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+        ctx.font = 'bold 13px "Comic Sans MS", sans-serif';
         ctx.fillStyle = '#2E7D32';
-        ctx.fillText(I18n.t('platforms'), col1X, startY - 18);
+        ctx.fillText(I18n.t('platforms'), logicalWidth / 2, startY - 16);
 
         const platforms = [
             { color: '#4CAF50', stroke: '#2E7D32', name: I18n.t('platformNormal'), desc: I18n.t('platformNormalDesc') },
@@ -348,27 +399,62 @@ const Renderer = (function () {
             { color: '#7C4DFF', stroke: '#6200EA', name: I18n.t('platformPortal'), desc: I18n.t('platformPortalDesc') }
         ];
 
-        platforms.forEach((p, i) => {
-            const y = startY + i * lineH;
-            ctx.fillStyle = p.color;
-            ctx.fillRect(col1X - 25, y, 50, 14);
-            Utils.drawDoodleLine(ctx, col1X - 25, y, col1X + 25, y, p.stroke, 1.5, 1);
-            Utils.drawDoodleLine(ctx, col1X + 25, y, col1X + 25, y + 14, p.stroke, 1.5, 1);
-            Utils.drawDoodleLine(ctx, col1X + 25, y + 14, col1X - 25, y + 14, p.stroke, 1.5, 1);
-            Utils.drawDoodleLine(ctx, col1X - 25, y + 14, col1X - 25, y, p.stroke, 1.5, 1);
+        const leftCX = 100;
+        const rightCX = 300;
+        const boxW = 50;
+        const boxH = 10;
 
+        platforms.forEach((p, i) => {
+            const col = i < 6 ? 0 : 1;
+            const row = col === 0 ? i : i - 6;
+            const cx = col === 0 ? leftCX : rightCX;
+            const y = startY + row * lineH;
+
+            ctx.fillStyle = p.color;
+            ctx.fillRect(cx - boxW / 2, y, boxW, boxH);
+            Utils.drawDoodleLine(ctx, cx - boxW / 2, y, cx + boxW / 2, y, p.stroke, 1, 1);
+            Utils.drawDoodleLine(ctx, cx + boxW / 2, y, cx + boxW / 2, y + boxH, p.stroke, 1, 1);
+            Utils.drawDoodleLine(ctx, cx + boxW / 2, y + boxH, cx - boxW / 2, y + boxH, p.stroke, 1, 1);
+            Utils.drawDoodleLine(ctx, cx - boxW / 2, y + boxH, cx - boxW / 2, y, p.stroke, 1, 1);
+
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'top';
             ctx.fillStyle = '#333';
-            ctx.font = 'bold 11px sans-serif';
-            ctx.fillText(p.name, col1X, y + 22);
-            ctx.fillStyle = '#666';
+            ctx.font = 'bold 10px sans-serif';
+            ctx.fillText(p.name, cx, y + boxH + 2);
+            ctx.fillStyle = '#888';
             ctx.font = '9px sans-serif';
-            ctx.fillText(p.desc, col1X, y + 36);
+            ctx.fillText(p.desc, cx, y + boxH + 14);
         });
 
-        // ─── 列2：道具 ───
+        const ctrlY = startY + 6 * lineH + 10;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+        ctx.fillStyle = '#555';
+        ctx.font = 'bold 12px "Comic Sans MS", sans-serif';
+        ctx.fillText(I18n.t('controls'), logicalWidth / 2, ctrlY);
+        const controls = [
+            I18n.t('ctrlMove'),
+            I18n.t('ctrlStart'),
+            I18n.t('ctrlPause'),
+            I18n.t('ctrlHelp'),
+            I18n.t('ctrlLang')
+        ];
+        ctx.font = '11px sans-serif';
+        ctx.fillStyle = '#666';
+        controls.forEach((c, i) => {
+            ctx.fillText(c, logicalWidth / 2, ctrlY + 18 + i * 15);
+        });
+    }
+
+    function drawTutorialItemsMonsters() {
+        const startY = 56;
+
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+        ctx.font = 'bold 13px "Comic Sans MS", sans-serif';
         ctx.fillStyle = '#E65100';
-        ctx.font = 'bold 14px "Comic Sans MS", sans-serif';
-        ctx.fillText(I18n.t('items'), col2X, startY - 18);
+        ctx.fillText(I18n.t('items'), logicalWidth / 2, startY - 16);
 
         const items = [
             { icon: '🔶', name: I18n.t('itemSpring'), desc: I18n.t('itemSpringDesc') },
@@ -385,24 +471,35 @@ const Renderer = (function () {
             { icon: '🛸', name: I18n.t('itemShip'), desc: I18n.t('itemShipDesc') }
         ];
 
+        const itemLineH = 26;
+        const itemStartY = startY;
+        const leftX = 10;
+        const rightX = 210;
+
         items.forEach((item, i) => {
-            const y = startY + i * 36;
-            ctx.font = '16px sans-serif';
+            const col = i < 6 ? 0 : 1;
+            const row = col === 0 ? i : i - 6;
+            const baseX = col === 0 ? leftX : rightX;
+            const y = itemStartY + row * itemLineH;
+
+            ctx.textBaseline = 'top';
+            ctx.font = '12px sans-serif';
             ctx.textAlign = 'left';
-            ctx.fillText(item.icon, col2X - 45, y + 4);
-            ctx.font = 'bold 11px sans-serif';
+            ctx.fillText(item.icon, baseX, y);
+            ctx.font = 'bold 10px sans-serif';
             ctx.fillStyle = '#333';
-            ctx.fillText(item.name, col2X - 20, y);
+            ctx.fillText(item.name, baseX + 22, y);
             ctx.font = '9px sans-serif';
-            ctx.fillStyle = '#666';
-            ctx.fillText(item.desc, col2X - 20, y + 14);
+            ctx.fillStyle = '#888';
+            ctx.fillText(item.desc, baseX + 22, y + 12);
         });
 
-        // ─── 列3：怪物 ───
+        const monsterStartY = itemStartY + 6 * itemLineH + 16;
         ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
         ctx.fillStyle = '#7B1FA2';
-        ctx.font = 'bold 14px "Comic Sans MS", sans-serif';
-        ctx.fillText(I18n.t('monsters'), col3X, startY - 18);
+        ctx.font = 'bold 13px "Comic Sans MS", sans-serif';
+        ctx.fillText(I18n.t('monsters'), logicalWidth / 2, monsterStartY - 16);
 
         const monsters = [
             { icon: '🛸', name: I18n.t('monsterUfo'), desc: I18n.t('monsterUfoDesc') },
@@ -411,43 +508,21 @@ const Renderer = (function () {
             { icon: '🔫', name: I18n.t('monsterTurret'), desc: I18n.t('monsterTurretDesc') }
         ];
 
+        const monsterLineH = 28;
+        const monsterBaseX = logicalWidth / 2 - 90;
         monsters.forEach((m, i) => {
-            const y = startY + i * 72;
-            ctx.font = '20px sans-serif';
+            const y = monsterStartY + i * monsterLineH;
+            ctx.textBaseline = 'top';
+            ctx.font = '14px sans-serif';
             ctx.textAlign = 'left';
-            ctx.fillText(m.icon, col3X - 45, y + 6);
-            ctx.font = 'bold 11px sans-serif';
+            ctx.fillText(m.icon, monsterBaseX, y);
+            ctx.font = 'bold 10px sans-serif';
             ctx.fillStyle = '#333';
-            ctx.fillText(m.name, col3X - 18, y);
+            ctx.fillText(m.name, monsterBaseX + 24, y);
             ctx.font = '9px sans-serif';
-            ctx.fillStyle = '#666';
-            ctx.fillText(m.desc, col3X - 18, y + 14);
+            ctx.fillStyle = '#888';
+            ctx.fillText(m.desc, monsterBaseX + 24, y + 13);
         });
-
-        // ─── 底部控制提示 ───
-        ctx.textAlign = 'center';
-        ctx.fillStyle = '#555';
-        ctx.font = '13px "Comic Sans MS", sans-serif';
-        ctx.fillText(I18n.t('controls'), logicalWidth / 2, logicalHeight - 80);
-
-        const controls = [
-            I18n.t('ctrlMove'),
-            I18n.t('ctrlStart'),
-            I18n.t('ctrlPause'),
-            I18n.t('ctrlHelp'),
-            I18n.t('ctrlLang')
-        ];
-        ctx.font = '12px sans-serif';
-        controls.forEach((c, i) => {
-            ctx.fillText(c, logicalWidth / 2, logicalHeight - 64 + i * 14);
-        });
-
-        // 返回提示
-        ctx.fillStyle = '#2196F3';
-        ctx.font = 'bold 14px "Comic Sans MS", sans-serif';
-        ctx.fillText(I18n.t('pressToGoBack'), logicalWidth / 2, logicalHeight - 14);
-
-        ctx.restore();
     }
 
     return {
@@ -459,6 +534,8 @@ const Renderer = (function () {
         drawHUD,
         drawMenu,
         drawGameOver,
-        drawTutorial
+        drawTutorial,
+        prevTutorialPage,
+        nextTutorialPage
     };
 })();
