@@ -157,6 +157,15 @@ const Renderer = (function () {
                 ctx.font = '9px sans-serif';
                 ctx.textAlign = 'center';
                 ctx.fillText(I18n.t('statusShip'), statusX + iconSize / 2, statusY + iconSize / 2 + 2);
+                statusX += 20;
+            }
+            if (player.speedBoostTimer > 0) {
+                ctx.fillStyle = 'rgba(255, 152, 0, 0.8)';
+                ctx.fillRect(statusX, statusY, iconSize, iconSize);
+                ctx.fillStyle = '#FFF';
+                ctx.font = '9px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(I18n.t('statusSpeed'), statusX + iconSize / 2, statusY + iconSize / 2 + 2);
             }
         }
 
@@ -317,7 +326,7 @@ const Renderer = (function () {
         const col2X = 200;
         const col3X = 330;
         const startY = 75;
-        const lineH = 58;
+        const lineH = 40;
 
         // ─── 列1：平台 ───
         ctx.textAlign = 'center';
@@ -330,7 +339,13 @@ const Renderer = (function () {
             { color: '#2196F3', stroke: '#1565C0', name: I18n.t('platformMoving'), desc: I18n.t('platformMovingDesc') },
             { color: '#795548', stroke: '#5D4037', name: I18n.t('platformFragile'), desc: I18n.t('platformFragileDesc') },
             { color: '#AB47BC', stroke: '#7B1FA2', name: I18n.t('platformVanish'), desc: I18n.t('platformVanishDesc') },
-            { color: '#F06292', stroke: '#C2185B', name: I18n.t('platformBouncy'), desc: I18n.t('platformBouncyDesc') }
+            { color: '#F06292', stroke: '#C2185B', name: I18n.t('platformBouncy'), desc: I18n.t('platformBouncyDesc') },
+            { color: '#8BC34A', stroke: '#558B2F', name: I18n.t('platformSticky'), desc: I18n.t('platformStickyDesc') },
+            { color: '#00BCD4', stroke: '#00838F', name: I18n.t('platformTeleport'), desc: I18n.t('platformTeleportDesc') },
+            { color: '#FF9800', stroke: '#E65100', name: I18n.t('platformSpeed'), desc: I18n.t('platformSpeedDesc') },
+            { color: '#E91E63', stroke: '#880E4F', name: I18n.t('platformSpringbed'), desc: I18n.t('platformSpringbedDesc') },
+            { color: '#D32F2F', stroke: '#B71C1C', name: I18n.t('platformChain'), desc: I18n.t('platformChainDesc') },
+            { color: '#7C4DFF', stroke: '#6200EA', name: I18n.t('platformPortal'), desc: I18n.t('platformPortalDesc') }
         ];
 
         platforms.forEach((p, i) => {
@@ -357,17 +372,21 @@ const Renderer = (function () {
 
         const items = [
             { icon: '🔶', name: I18n.t('itemSpring'), desc: I18n.t('itemSpringDesc') },
+            { icon: '🔴', name: I18n.t('itemSuperSpring'), desc: I18n.t('itemSuperSpringDesc') },
             { icon: '🚀', name: I18n.t('itemRocket'), desc: I18n.t('itemRocketDesc') },
             { icon: '🛡️', name: I18n.t('itemShield'), desc: I18n.t('itemShieldDesc') },
             { icon: '🪙', name: I18n.t('itemCoin'), desc: I18n.t('itemCoinDesc') },
             { icon: '🧲', name: I18n.t('itemMagnet'), desc: I18n.t('itemMagnetDesc') },
             { icon: '⭐', name: I18n.t('itemDouble'), desc: I18n.t('itemDoubleDesc') },
             { icon: '🪂', name: I18n.t('itemParachute'), desc: I18n.t('itemParachuteDesc') },
+            { icon: '🔮', name: I18n.t('itemShrink'), desc: I18n.t('itemShrinkDesc') },
+            { icon: '⏱️', name: I18n.t('itemSlowMo'), desc: I18n.t('itemSlowMoDesc') },
+            { icon: '💣', name: I18n.t('itemBomb'), desc: I18n.t('itemBombDesc') },
             { icon: '🛸', name: I18n.t('itemShip'), desc: I18n.t('itemShipDesc') }
         ];
 
         items.forEach((item, i) => {
-            const y = startY + i * 42;
+            const y = startY + i * 36;
             ctx.font = '16px sans-serif';
             ctx.textAlign = 'left';
             ctx.fillText(item.icon, col2X - 45, y + 4);

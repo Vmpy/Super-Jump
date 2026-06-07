@@ -11,7 +11,8 @@ const Platforms = (function () {
     const INITIAL_COUNT = 8;
 
     let platforms = [];
-    let highestPlatformY = 0; // 最上方的平台y坐标（越小越高）
+    let highestPlatformY = 0;
+    let portalPairs = [];
 
     // ─── 平台类 ───
     class Platform {
@@ -27,6 +28,7 @@ const Platforms = (function () {
             this.moveCenter = x;
             this.moveDir = 1;
             this.hasItem = false;
+            this.portalPair = null;
 
             // 消失平台专用
             this.vanishTimer = 0;
@@ -124,6 +126,22 @@ const Platforms = (function () {
                     fillColor = '#00BCD4';
                     strokeColor = '#00838F';
                     break;
+                case 'speed':
+                    fillColor = '#FF9800';
+                    strokeColor = '#E65100';
+                    break;
+                case 'springbed':
+                    fillColor = '#E91E63';
+                    strokeColor = '#880E4F';
+                    break;
+                case 'chain':
+                    fillColor = '#D32F2F';
+                    strokeColor = '#B71C1C';
+                    break;
+                case 'portal':
+                    fillColor = '#7C4DFF';
+                    strokeColor = '#6200EA';
+                    break;
                 default:
                     fillColor = '#4CAF50';
                     strokeColor = '#2E7D32';
@@ -174,12 +192,49 @@ const Platforms = (function () {
                 ctx.textBaseline = 'middle';
                 ctx.fillText('✦', this.x + this.width / 2, screenY + this.height / 2 + 1);
             }
+
+            // 加速平台画箭头标记
+            if (this.type === 'speed') {
+                ctx.fillStyle = '#FFF';
+                ctx.font = 'bold 10px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('»', this.x + this.width / 2, screenY + this.height / 2 + 1);
+            }
+
+            // 弹簧床平台画弹簧标记
+            if (this.type === 'springbed') {
+                ctx.fillStyle = '#FFF';
+                ctx.font = 'bold 10px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('⌇', this.x + this.width / 2, screenY + this.height / 2 + 1);
+            }
+
+            // 连锁平台画链接标记
+            if (this.type === 'chain') {
+                ctx.fillStyle = '#FFF';
+                ctx.font = 'bold 10px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('⛓', this.x + this.width / 2, screenY + this.height / 2 + 1);
+            }
+
+            // 传送门平台画门标记
+            if (this.type === 'portal') {
+                ctx.fillStyle = '#FFF';
+                ctx.font = 'bold 10px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('⊘', this.x + this.width / 2, screenY + this.height / 2 + 1);
+            }
         }
     }
 
     // ─── 初始化 ───
     function init(canvasWidth, canvasHeight) {
         platforms = [];
+        portalPairs = [];
         highestPlatformY = canvasHeight - 80;
 
         // 安全平台：固定在中央，确保玩家出生正下方一定有落脚点
@@ -220,21 +275,38 @@ const Platforms = (function () {
         const gap = BASE_GAP + difficulty * (MAX_GAP - BASE_GAP);
         const y = highestPlatformY - gap;
 
-        // 随机类型（7种平台）
+        // 随机类型（11种平台）
         const typeItem = Utils.weightedRandom([
-            { type: 'normal', weight: Math.max(0.2, 0.6 - difficulty * 0.2) },
-            { type: 'moving', weight: Math.min(0.25, 0.2 + difficulty * 0.1) },
-            { type: 'breakable', weight: Math.min(0.2, 0.1 + difficulty * 0.1) },
-            { type: 'vanishing', weight: Math.min(0.15, 0.05 + difficulty * 0.08) },
-            { type: 'bouncy', weight: 0.08 },
-            { type: 'sticky', weight: Math.min(0.15, 0.05 + difficulty * 0.08) },
-            { type: 'teleport', weight: Math.min(0.1, 0.03 + difficulty * 0.05) }
+            { type: 'normal', weight: Math.max(0.2, 0.5 - difficulty * 0.2) },
+            { type: 'moving', weight: Math.min(0.2, 0.15 + difficulty * 0.1) },
+            { type: 'breakable', weight: Math.min(0.15, 0.08 + difficulty * 0.08) },
+            { type: 'vanishing', weight: Math.min(0.12, 0.04 + difficulty * 0.06) },
+            { type: 'bouncy', weight: 0.06 },
+            { type: 'sticky', weight: Math.min(0.1, 0.04 + difficulty * 0.06) },
+            { type: 'teleport', weight: Math.min(0.08, 0.02 + difficulty * 0.04) },
+            { type: 'speed', weight: 0.05 },
+            { type: 'springbed', weight: 0.05 },
+            { type: 'chain', weight: Math.min(0.08, 0.03 + difficulty * 0.04) },
+            { type: 'portal', weight: 0.04 }
         ]);
 
         const x = Utils.randomInt(20, canvasWidth - PLATFORM_WIDTH - 20);
         const p = new Platform(x, y, typeItem.type);
         platforms.push(p);
         highestPlatformY = y;
+
+        // 传送门平台需要成对生成
+        if (typeItem.type === 'portal') {
+            const gap2 = BASE_GAP + difficulty * (MAX_GAP - BASE_GAP);
+            const y2 = highestPlatformY - gap2;
+            const x2 = Utils.randomInt(20, canvasWidth - PLATFORM_WIDTH - 20);
+            const p2 = new Platform(x2, y2, 'portal');
+            p.portalPair = p2;
+            p2.portalPair = p;
+            platforms.push(p2);
+            highestPlatformY = y2;
+            portalPairs.push([p, p2]);
+        }
 
         // 随机生成道具（只在运行时调用，此时 Items 已加载）
         if (typeof Items !== 'undefined' && !p.hasItem && Math.random() < 0.15) {
@@ -276,6 +348,36 @@ const Platforms = (function () {
         // 清理屏幕下方很远的平台
         const cleanupY = cameraTop + canvasHeight * 2;
         platforms = platforms.filter(p => p.y < cleanupY && p.alive);
+        portalPairs = portalPairs.filter(([a, b]) => a.alive && b.alive && a.y < cleanupY && b.y < cleanupY);
+    }
+
+    // ─── 连锁碎裂 ───
+    function chainBreak(brokenPlatform, canvasWidth) {
+        const chainRange = 120;
+        const broken = new Set();
+        const queue = [brokenPlatform];
+        broken.add(brokenPlatform);
+
+        while (queue.length > 0) {
+            const current = queue.shift();
+            for (const p of platforms) {
+                if (p.type !== 'chain' || !p.alive || broken.has(p)) continue;
+                const dx = (p.x + p.width / 2) - (current.x + current.width / 2);
+                const dy = (p.y + p.height / 2) - (current.y + current.height / 2);
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < chainRange) {
+                    broken.add(p);
+                    queue.push(p);
+                    setTimeout(() => {
+                        if (p.alive) {
+                            p.alive = false;
+                            AudioManager.breakPlatform();
+                            Particles.emitBreak(p.x, p.y, p.width, '#D32F2F');
+                        }
+                    }, 100 * queue.length);
+                }
+            }
+        }
     }
 
     // ─── 碰撞检测 ───
@@ -314,6 +416,30 @@ const Platforms = (function () {
                     player.y = p.y - player.height;
                     player.vy = 0;
                     Player.teleport(canvasWidth);
+                    Player.jump('normal');
+                } else if (p.type === 'speed') {
+                    player.y = p.y - player.height;
+                    player.vy = 0;
+                    Player.activateSpeedBoost();
+                    Player.jump('normal');
+                } else if (p.type === 'springbed') {
+                    player.y = p.y - player.height;
+                    player.vy = 0;
+                    Player.jump('springbed');
+                } else if (p.type === 'chain') {
+                    p.break();
+                    chainBreak(p, canvasWidth);
+                    player.y = p.y - player.height;
+                    player.vy = 0;
+                    Player.jump('normal');
+                } else if (p.type === 'portal') {
+                    player.y = p.y - player.height;
+                    player.vy = 0;
+                    if (p.portalPair && p.portalPair.alive) {
+                        player.x = p.portalPair.x + p.portalPair.width / 2 - player.width / 2;
+                        player.y = p.portalPair.y - player.height;
+                        Particles.emitTeleport(player.x + player.width / 2, player.y + player.height / 2);
+                    }
                     Player.jump('normal');
                 } else {
                     player.y = p.y - player.height;

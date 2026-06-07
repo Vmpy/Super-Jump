@@ -11,6 +11,7 @@ const Player = (function () {
     const BASE_JUMP_VELOCITY = -500;
     const SPRING_JUMP_VELOCITY = -800;
     const BOUNCY_JUMP_VELOCITY = -1000;
+    const SPRINGBED_JUMP_VELOCITY = -700;
     const MAX_FALL_SPEED = 600;
     const PARACHUTE_FALL_SPEED = 250; // 降落伞时下落速度
     const ROCKET_DURATION = 2.0;   // 火箭持续时间（秒）
@@ -52,6 +53,7 @@ const Player = (function () {
             // 状态计时
             stickyTimer: 0,
             invincibleTimer: 0,
+            speedBoostTimer: 0,
             score: 0,
             maxHeight: 0,
             alive: true
@@ -80,6 +82,7 @@ const Player = (function () {
         if (player.parachuteTimer > 0) player.parachuteTimer -= dt;
         if (player.slowMoTimer > 0) player.slowMoTimer -= dt;
         if (player.invincibleTimer > 0) player.invincibleTimer -= dt;
+        if (player.speedBoostTimer > 0) player.speedBoostTimer -= dt;
         if (player.shrinkTimer > 0) {
             player.shrinkTimer -= dt;
             if (player.shrinkTimer <= 0) {
@@ -102,20 +105,21 @@ const Player = (function () {
         }
 
         // ─── 水平移动 ───
+        const speedMult = player.speedBoostTimer > 0 ? 2.0 : 1.0;
         if (Input.isDown('left')) {
-            player.vx = -MOVE_SPEED;
+            player.vx = -MOVE_SPEED * speedMult;
             player.facingRight = false;
         } else if (Input.isDown('right')) {
-            player.vx = MOVE_SPEED;
+            player.vx = MOVE_SPEED * speedMult;
             player.facingRight = true;
         } else if (Input.isMouseDown()) {
             const mouseX = Input.getMouseX();
             const playerCenterX = player.x + player.width / 2;
             if (mouseX < playerCenterX) {
-                player.vx = -MOVE_SPEED;
+                player.vx = -MOVE_SPEED * speedMult;
                 player.facingRight = false;
             } else {
-                player.vx = MOVE_SPEED;
+                player.vx = MOVE_SPEED * speedMult;
                 player.facingRight = true;
             }
         } else {
@@ -175,6 +179,11 @@ const Player = (function () {
             player.vy = BOUNCY_JUMP_VELOCITY;
             AudioManager.springJump();
             Particles.emitSpring(player.x + player.width / 2, player.y + player.height);
+        } else if (type === 'springbed') {
+            player.vy = SPRINGBED_JUMP_VELOCITY;
+            player.vx = (Math.random() < 0.5 ? -1 : 1) * MOVE_SPEED * 1.5;
+            AudioManager.springJump();
+            Particles.emitSpring(player.x + player.width / 2, player.y + player.height);
         } else if (type === 'spring') {
             player.vy = SPRING_JUMP_VELOCITY;
             AudioManager.springJump();
@@ -211,6 +220,13 @@ const Player = (function () {
     function activateShield() {
         if (!player) return;
         player.hasShield = true;
+    }
+
+    // ─── 激活加速 ───
+    function activateSpeedBoost() {
+        if (!player) return;
+        player.speedBoostTimer = 2.0;
+        AudioManager.collectItem();
     }
 
     // ─── 激活磁铁 ───
@@ -301,7 +317,20 @@ const Player = (function () {
         const screenY = player.y - camera.y;
         if (screenY < -100 || screenY > camera.screenHeight + 100) return;
 
-        Utils.drawDoodlePlayer(ctx, player.x, screenY, player.width, player.height, player.facingRight);
+        const scaleX = player.width / PLAYER_WIDTH;
+        const scaleY = player.height / PLAYER_HEIGHT;
+
+        if (scaleX < 1 || scaleY < 1) {
+            ctx.save();
+            const feetX = player.x + player.width / 2;
+            const feetY = screenY + player.height;
+            ctx.translate(feetX, feetY);
+            ctx.scale(scaleX, scaleY);
+            Utils.drawDoodlePlayer(ctx, -PLAYER_WIDTH / 2, -PLAYER_HEIGHT, PLAYER_WIDTH, PLAYER_HEIGHT, player.facingRight);
+            ctx.restore();
+        } else {
+            Utils.drawDoodlePlayer(ctx, player.x, screenY, player.width, player.height, player.facingRight);
+        }
 
         // 绘制护盾效果
         if (player.hasShield) {
@@ -323,6 +352,18 @@ const Player = (function () {
             ctx.beginPath();
             ctx.arc(player.x + player.width / 2, screenY + player.height / 2, player.width * 0.7, 0, Math.PI * 2);
             ctx.fill();
+            ctx.restore();
+        }
+
+        // 加速效果拖尾
+        if (player.speedBoostTimer > 0) {
+            ctx.save();
+            ctx.globalAlpha = 0.4;
+            ctx.fillStyle = '#FF9800';
+            for (let i = 1; i <= 3; i++) {
+                const trailX = player.x - player.vx * 0.02 * i;
+                ctx.fillRect(trailX, screenY + 10, player.width, player.height - 20);
+            }
             ctx.restore();
         }
 
@@ -387,6 +428,7 @@ const Player = (function () {
         activateRocket,
         activateShip,
         activateShield,
+        activateSpeedBoost,
         activateMagnet,
         activateDoubleScore,
         activateParachute,
