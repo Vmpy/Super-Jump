@@ -45,7 +45,7 @@ const Particles = (function () {
 
     // ─── 发射器 ───
     function emitBreak(x, y, width, color = '#795548') {
-        const count = 8;
+        const count = 6;
         for (let i = 0; i < count; i++) {
             const angle = (i / count) * Math.PI * 2;
             const speed = Utils.random(80, 200);
@@ -56,7 +56,7 @@ const Particles = (function () {
                 Utils.random(3, 6),
                 Math.cos(angle) * speed,
                 Math.sin(angle) * speed - 100,
-                Utils.random(0.3, 0.6)
+                Utils.random(0.15, 0.3)
             ));
         }
     }
@@ -118,7 +118,7 @@ const Particles = (function () {
                 Utils.random(4, 8),
                 Math.cos(angle) * speed,
                 Math.sin(angle) * speed,
-                Utils.random(0.4, 0.8)
+                Utils.random(0.2, 0.4)
             ));
         }
         for (let i = 0; i < 8; i++) {
@@ -130,7 +130,7 @@ const Particles = (function () {
                 Utils.random(2, 5),
                 Math.cos(angle) * speed,
                 Math.sin(angle) * speed,
-                Utils.random(0.3, 0.6)
+                Utils.random(0.15, 0.3)
             ));
         }
     }

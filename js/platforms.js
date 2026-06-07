@@ -374,7 +374,7 @@ const Platforms = (function () {
                             AudioManager.breakPlatform();
                             Particles.emitBreak(p.x, p.y, p.width, '#D32F2F');
                         }
-                    }, 100 * queue.length);
+                    }, 50 * queue.length);
                 }
             }
         }
