@@ -45,13 +45,11 @@ const Platforms = (function () {
         update(dt, canvasWidth) {
             if (this.type === 'moving') {
                 this.x += this.moveSpeed * this.moveDir * dt;
-                if (this.x + this.width > canvasWidth) {
-                    this.x = canvasWidth - this.width;
-                    this.moveDir = -1;
-                }
-                if (this.x < 0) {
-                    this.x = 0;
-                    this.moveDir = 1;
+                // 穿墙效果：从一边出去，从另一边进来
+                if (this.x + this.width < 0) {
+                    this.x = canvasWidth;
+                } else if (this.x > canvasWidth) {
+                    this.x = -this.width;
                 }
             }
 
