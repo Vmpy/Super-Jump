@@ -294,8 +294,18 @@ const Obstacles = (function () {
                 height: o.height - 10
             };
             if (Utils.checkAABB(player, hitBox)) {
-                if (Player.takeDamage()) {
-                    return true; // 游戏结束
+                // 检查是否踩头（UFO和怪物可以被踩死）
+                if ((o.type === 'ufo' || o.type === 'monster') && isStomping(player, o)) {
+                    o.alive = false;
+                    Particles.emitBreak(o.x + o.width / 2, o.y + o.height / 2, o.width, '#8BC34A');
+                    AudioManager.breakPlatform();
+                    // 踩头后弹跳
+                    player.vy = -400;
+                    player.y = o.y - player.height;
+                } else {
+                    if (Player.takeDamage()) {
+                        return true; // 游戏结束
+                    }
                 }
             }
         }
@@ -312,6 +322,20 @@ const Obstacles = (function () {
         }
 
         return false;
+    }
+
+    // 判断是否踩头
+    function isStomping(player, obstacle) {
+        // 玩家必须在下落
+        if (player.vy <= 0) return false;
+        // 玩家上一帧底部在障碍物顶部之上（或接近）
+        const prevBottom = player.prevY + player.height;
+        const obstacleTop = obstacle.y;
+        if (prevBottom > obstacleTop + 10) return false;
+        // 玩家当前底部在障碍物上半部分
+        const playerBottom = player.y + player.height;
+        const obstacleMid = obstacle.y + obstacle.height / 2;
+        return playerBottom < obstacleMid;
     }
 
     function draw(ctx, camera) {
