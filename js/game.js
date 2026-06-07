@@ -84,6 +84,7 @@ const Game = (function () {
         // 清理障碍和粒子
         Obstacles.clear();
         Particles.clear();
+        Items.clear();
     }
 
     function restartGame() {

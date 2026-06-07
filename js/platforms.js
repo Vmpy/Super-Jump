@@ -26,6 +26,7 @@ const Platforms = (function () {
             this.moveRange = 0;
             this.moveCenter = x;
             this.moveDir = 1;
+            this.hasItem = false;
 
             // 消失平台专用
             this.vanishTimer = 0;
@@ -42,12 +43,14 @@ const Platforms = (function () {
         update(dt, canvasWidth) {
             if (this.type === 'moving') {
                 this.x += this.moveSpeed * this.moveDir * dt;
-                if (this.x > this.moveCenter + this.moveRange || this.x < this.moveCenter - this.moveRange) {
-                    this.moveDir *= -1;
+                if (this.x + this.width > canvasWidth) {
+                    this.x = canvasWidth - this.width;
+                    this.moveDir = -1;
                 }
-                // 穿墙
-                if (this.x + this.width < 0) this.x = canvasWidth;
-                if (this.x > canvasWidth) this.x = -this.width;
+                if (this.x < 0) {
+                    this.x = 0;
+                    this.moveDir = 1;
+                }
             }
 
             // 消失平台逻辑
@@ -234,7 +237,8 @@ const Platforms = (function () {
         highestPlatformY = y;
 
         // 随机生成道具（只在运行时调用，此时 Items 已加载）
-        if (typeof Items !== 'undefined' && Math.random() < 0.15) {
+        if (typeof Items !== 'undefined' && !p.hasItem && Math.random() < 0.15) {
+            p.hasItem = true;
             const typeRoll = Math.random();
             let itemType;
             if (typeRoll < 0.20) itemType = 'spring';

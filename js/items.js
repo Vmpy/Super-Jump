@@ -21,14 +21,13 @@ const Items = (function () {
             this.bobSpeed = 3;
             // 绑定平台（移动平台上的道具需要跟随）
             this.platform = platform;
-            this.platformOffset = platform ? (x - (platform.x + platform.width / 2)) : 0;
         }
 
         update(dt) {
             this.bobOffset += this.bobSpeed * dt;
-            // 跟随平台移动
             if (this.platform && this.platform.alive) {
-                this.x = this.platform.x + this.platform.width / 2 + this.platformOffset;
+                this.x = this.platform.x + this.platform.width / 2 - this.width / 2;
+                this.y = this.platform.y - this.height - 5;
             }
         }
 
@@ -505,6 +504,10 @@ const Items = (function () {
         return items;
     }
 
+    function clear() {
+        items = [];
+    }
+
     return {
         spawn,
         addItem,
@@ -512,6 +515,7 @@ const Items = (function () {
         checkCollisions,
         cleanup,
         draw,
-        getItems
+        getItems,
+        clear
     };
 })();

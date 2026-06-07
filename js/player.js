@@ -51,6 +51,7 @@ const Player = (function () {
             slowMoTimer: 0,
             // 状态计时
             stickyTimer: 0,
+            invincibleTimer: 0,
             score: 0,
             maxHeight: 0,
             alive: true
@@ -78,6 +79,7 @@ const Player = (function () {
         if (player.doubleScoreTimer > 0) player.doubleScoreTimer -= dt;
         if (player.parachuteTimer > 0) player.parachuteTimer -= dt;
         if (player.slowMoTimer > 0) player.slowMoTimer -= dt;
+        if (player.invincibleTimer > 0) player.invincibleTimer -= dt;
         if (player.shrinkTimer > 0) {
             player.shrinkTimer -= dt;
             if (player.shrinkTimer <= 0) {
@@ -268,16 +270,20 @@ const Player = (function () {
     function takeDamage() {
         if (!player) return;
         if (player.isShiping) {
-            return false; // 飞船期间无敌
+            return false;
+        }
+        if (player.invincibleTimer > 0) {
+            return false;
         }
         if (player.hasShield) {
             player.hasShield = false;
-            AudioManager.collectItem(); // 护盾破裂音效
-            return false; // 没死
+            player.invincibleTimer = 1.0;
+            AudioManager.collectItem();
+            return false;
         }
         player.alive = false;
         AudioManager.gameOver();
-        return true; // 死了
+        return true;
     }
 
     // ─── 收集分数道具 ───
@@ -306,6 +312,17 @@ const Player = (function () {
             ctx.beginPath();
             ctx.arc(player.x + player.width / 2, screenY + player.height / 2, player.width * 0.8, 0, Math.PI * 2);
             ctx.stroke();
+            ctx.restore();
+        }
+
+        // 无敌闪烁效果
+        if (player.invincibleTimer > 0 && !player.hasShield) {
+            ctx.save();
+            ctx.globalAlpha = 0.3 + Math.sin(player.invincibleTimer * 20) * 0.3;
+            ctx.fillStyle = '#00E5FF';
+            ctx.beginPath();
+            ctx.arc(player.x + player.width / 2, screenY + player.height / 2, player.width * 0.7, 0, Math.PI * 2);
+            ctx.fill();
             ctx.restore();
         }
 
