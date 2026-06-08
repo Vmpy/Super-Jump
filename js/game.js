@@ -173,6 +173,12 @@ const Game = (function () {
         if (Input.isPressed('lang')) {
             I18n.toggle();
         }
+        if (Input.isPressed('left')) {
+            Renderer.prevTutorialPage();
+        }
+        if (Input.isPressed('right')) {
+            Renderer.nextTutorialPage();
+        }
     }
 
     function updatePlaying(dt) {
