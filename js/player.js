@@ -381,35 +381,44 @@ const Player = (function () {
 
         // 绘制飞船状态
         if (player.isShiping) {
-            // 飞船外壳
             ctx.save();
+            const shipCx = player.x + player.width / 2;
+            const shipCy = screenY + player.height / 2;
             ctx.fillStyle = '#607D8B';
             ctx.beginPath();
-            ctx.ellipse(player.x + player.width / 2, screenY + player.height / 2 - 5, player.width * 0.7, player.height * 0.5, 0, 0, Math.PI * 2);
+            ctx.moveTo(shipCx, shipCy - 18);
+            ctx.lineTo(shipCx + 14, shipCy + 6);
+            ctx.lineTo(shipCx - 14, shipCy + 6);
+            ctx.closePath();
             ctx.fill();
-            // 飞船翅膀
+            Utils.drawDoodleLine(ctx, shipCx - 14, shipCy + 6, shipCx, shipCy - 18, '#455A64', 2, 2);
+            Utils.drawDoodleLine(ctx, shipCx, shipCy - 18, shipCx + 14, shipCy + 6, '#455A64', 2, 2);
+            Utils.drawDoodleLine(ctx, shipCx - 14, shipCy + 6, shipCx + 14, shipCy + 6, '#455A64', 2, 2);
             ctx.fillStyle = '#90A4AE';
             ctx.beginPath();
-            ctx.moveTo(player.x + player.width / 2 - 10, screenY + player.height / 2 + 5);
-            ctx.lineTo(player.x + player.width / 2 - 18, screenY + player.height / 2 + 15);
-            ctx.lineTo(player.x + player.width / 2 - 5, screenY + player.height / 2 + 10);
+            ctx.moveTo(shipCx - 12, shipCy + 2);
+            ctx.lineTo(shipCx - 20, shipCy + 14);
+            ctx.lineTo(shipCx - 6, shipCy + 10);
             ctx.closePath();
             ctx.fill();
+            Utils.drawDoodleLine(ctx, shipCx - 12, shipCy + 2, shipCx - 20, shipCy + 14, '#607D8B', 1.5, 2);
+            Utils.drawDoodleLine(ctx, shipCx - 20, shipCy + 14, shipCx - 6, shipCy + 10, '#607D8B', 1.5, 2);
             ctx.beginPath();
-            ctx.moveTo(player.x + player.width / 2 + 10, screenY + player.height / 2 + 5);
-            ctx.lineTo(player.x + player.width / 2 + 18, screenY + player.height / 2 + 15);
-            ctx.lineTo(player.x + player.width / 2 + 5, screenY + player.height / 2 + 10);
+            ctx.moveTo(shipCx + 12, shipCy + 2);
+            ctx.lineTo(shipCx + 20, shipCy + 14);
+            ctx.lineTo(shipCx + 6, shipCy + 10);
             ctx.closePath();
             ctx.fill();
-            // 驾驶舱
+            Utils.drawDoodleLine(ctx, shipCx + 12, shipCy + 2, shipCx + 20, shipCy + 14, '#607D8B', 1.5, 2);
+            Utils.drawDoodleLine(ctx, shipCx + 20, shipCy + 14, shipCx + 6, shipCy + 10, '#607D8B', 1.5, 2);
             ctx.fillStyle = '#81D4FA';
             ctx.beginPath();
-            ctx.arc(player.x + player.width / 2, screenY + player.height / 2 - 8, 4, 0, Math.PI * 2);
+            ctx.arc(shipCx, shipCy - 8, 4, 0, Math.PI * 2);
             ctx.fill();
-            // 飞船尾焰
+            Utils.drawDoodleCircle(ctx, shipCx, shipCy - 8, 4, '#0288D1', 1.5, 2);
             const flameCount = 5;
             for (let i = 0; i < flameCount; i++) {
-                const fx = player.x + player.width / 2 + Utils.random(-6, 6);
+                const fx = shipCx + Utils.random(-6, 6);
                 const fy = screenY + player.height + Utils.random(5, 25);
                 const fsize = Utils.random(3, 9);
                 ctx.fillStyle = Utils.randomInt(0, 1) ? '#FF5722' : '#FFEB3B';

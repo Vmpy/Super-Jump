@@ -151,6 +151,18 @@ const Platforms = (function () {
             ctx.fillStyle = fillColor;
             ctx.fillRect(this.x, screenY, this.width, this.height);
 
+            // 手绘斜线阴影（涂鸦风格）
+            ctx.strokeStyle = strokeColor;
+            ctx.lineWidth = 1;
+            ctx.globalAlpha = 0.3;
+            for (let i = 0; i < this.width; i += 6) {
+                ctx.beginPath();
+                ctx.moveTo(this.x + i, screenY + this.height);
+                ctx.lineTo(this.x + i + 4, screenY);
+                ctx.stroke();
+            }
+            ctx.globalAlpha = 1;
+
             // 手绘边框
             Utils.drawDoodleLine(ctx, this.x, screenY, this.x + this.width, screenY, strokeColor, 2, 2);
             Utils.drawDoodleLine(ctx, this.x + this.width, screenY, this.x + this.width, screenY + this.height, strokeColor, 2, 2);
@@ -159,74 +171,120 @@ const Platforms = (function () {
 
             // 弹力平台画个弹簧标记
             if (this.type === 'bouncy') {
-                ctx.fillStyle = '#FFF';
-                ctx.font = 'bold 10px sans-serif';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText('~', this.x + this.width / 2, screenY + this.height / 2 + 1);
+                ctx.strokeStyle = '#FFF';
+                ctx.lineWidth = 1.5;
+                ctx.lineCap = 'round';
+                ctx.beginPath();
+                const bx = this.x + this.width / 2;
+                const by = screenY + this.height / 2;
+                ctx.moveTo(bx - 6, by + 3);
+                ctx.lineTo(bx - 3, by - 3);
+                ctx.lineTo(bx + 3, by + 3);
+                ctx.lineTo(bx + 6, by - 3);
+                ctx.stroke();
             }
 
             // 消失平台画个时钟标记
             if (this.type === 'vanishing') {
-                ctx.fillStyle = '#FFF';
-                ctx.font = 'bold 9px sans-serif';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText('◷', this.x + this.width / 2, screenY + this.height / 2 + 1);
+                const tx = this.x + this.width / 2;
+                const ty = screenY + this.height / 2;
+                Utils.drawDoodleCircle(ctx, tx, ty, 4, '#FFF', 1.5, 1);
+                Utils.drawDoodleLine(ctx, tx, ty, tx, ty - 3, '#FFF', 1.5, 1);
+                Utils.drawDoodleLine(ctx, tx, ty, tx + 2, ty + 1, '#FFF', 1.5, 1);
             }
 
             // 粘液平台画个波浪标记
             if (this.type === 'sticky') {
-                ctx.fillStyle = '#FFF';
-                ctx.font = 'bold 10px sans-serif';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText('≈', this.x + this.width / 2, screenY + this.height / 2 + 1);
+                ctx.strokeStyle = '#FFF';
+                ctx.lineWidth = 1.5;
+                ctx.lineCap = 'round';
+                const sx = this.x + this.width / 2;
+                const sy = screenY + this.height / 2;
+                ctx.beginPath();
+                ctx.moveTo(sx - 8, sy);
+                ctx.lineTo(sx - 4, sy - 3);
+                ctx.lineTo(sx, sy);
+                ctx.lineTo(sx + 4, sy + 3);
+                ctx.lineTo(sx + 8, sy);
+                ctx.stroke();
             }
 
             // 传送平台画个星形标记
             if (this.type === 'teleport') {
+                const tx = this.x + this.width / 2;
+                const ty = screenY + this.height / 2;
                 ctx.fillStyle = '#FFF';
-                ctx.font = 'bold 10px sans-serif';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText('✦', this.x + this.width / 2, screenY + this.height / 2 + 1);
+                ctx.beginPath();
+                for (let i = 0; i < 8; i++) {
+                    const r = i % 2 === 0 ? 5 : 2;
+                    const a = (i / 8) * Math.PI * 2 - Math.PI / 2;
+                    const px = tx + Math.cos(a) * r;
+                    const py = ty + Math.sin(a) * r;
+                    if (i === 0) ctx.moveTo(px, py);
+                    else ctx.lineTo(px, py);
+                }
+                ctx.closePath();
+                ctx.fill();
             }
 
             // 加速平台画箭头标记
             if (this.type === 'speed') {
-                ctx.fillStyle = '#FFF';
-                ctx.font = 'bold 10px sans-serif';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText('»', this.x + this.width / 2, screenY + this.height / 2 + 1);
+                ctx.strokeStyle = '#FFF';
+                ctx.lineWidth = 2;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                const ax = this.x + this.width / 2;
+                const ay = screenY + this.height / 2;
+                ctx.beginPath();
+                ctx.moveTo(ax - 6, ay);
+                ctx.lineTo(ax + 2, ay);
+                ctx.moveTo(ax - 1, ay - 3);
+                ctx.lineTo(ax + 3, ay);
+                ctx.lineTo(ax - 1, ay + 3);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(ax + 1, ay);
+                ctx.lineTo(ax + 7, ay);
+                ctx.moveTo(ax + 4, ay - 3);
+                ctx.lineTo(ax + 8, ay);
+                ctx.lineTo(ax + 4, ay + 3);
+                ctx.stroke();
             }
 
             // 弹簧床平台画弹簧标记
             if (this.type === 'springbed') {
-                ctx.fillStyle = '#FFF';
-                ctx.font = 'bold 10px sans-serif';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText('⌇', this.x + this.width / 2, screenY + this.height / 2 + 1);
+                ctx.strokeStyle = '#FFF';
+                ctx.lineWidth = 1.5;
+                ctx.lineCap = 'round';
+                const bx = this.x + this.width / 2;
+                const by = screenY + this.height / 2;
+                ctx.beginPath();
+                ctx.moveTo(bx - 5, by + 4);
+                ctx.lineTo(bx - 3, by - 2);
+                ctx.lineTo(bx + 3, by + 2);
+                ctx.lineTo(bx + 5, by - 4);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(bx - 2, by - 5);
+                ctx.lineTo(bx, by - 7);
+                ctx.lineTo(bx + 2, by - 5);
+                ctx.stroke();
             }
 
             // 连锁平台画链接标记
             if (this.type === 'chain') {
-                ctx.fillStyle = '#FFF';
-                ctx.font = 'bold 10px sans-serif';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText('⛓', this.x + this.width / 2, screenY + this.height / 2 + 1);
+                const lx = this.x + this.width / 2;
+                const ly = screenY + this.height / 2;
+                Utils.drawDoodleCircle(ctx, lx - 3, ly, 3, '#FFF', 1.5, 1);
+                Utils.drawDoodleCircle(ctx, lx + 3, ly, 3, '#FFF', 1.5, 1);
             }
 
             // 传送门平台画门标记
             if (this.type === 'portal') {
-                ctx.fillStyle = '#FFF';
-                ctx.font = 'bold 10px sans-serif';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText('⊘', this.x + this.width / 2, screenY + this.height / 2 + 1);
+                const px = this.x + this.width / 2;
+                const py = screenY + this.height / 2;
+                Utils.drawDoodleCircle(ctx, px, py, 4, '#FFF', 1.5, 1);
+                Utils.drawDoodleCircle(ctx, px, py, 2, '#FFF', 1.5, 1);
             }
         }
     }

@@ -28,7 +28,8 @@ const Obstacles = (function () {
             if (screenY < -50 || screenY > camera.screenHeight + 50) return;
             ctx.fillStyle = '#FFEB3B';
             ctx.fillRect(this.x, screenY, this.width, this.height);
-            Utils.drawDoodleLine(ctx, this.x, screenY, this.x + this.width, screenY, '#F57F17', 1, 1);
+            Utils.drawDoodleLine(ctx, this.x, screenY, this.x + this.width, screenY, '#F57F17', 1.5, 2);
+            Utils.drawDoodleLine(ctx, this.x, screenY + this.height, this.x + this.width, screenY + this.height, '#F57F17', 1.5, 2);
         }
     }
 
@@ -113,41 +114,41 @@ const Obstacles = (function () {
     // ─── 绘制 UFO ───
     function drawUFO(ctx, cx, cy) {
         ctx.save();
-        // 飞船主体
         ctx.fillStyle = '#9C27B0';
         ctx.beginPath();
-        ctx.ellipse(cx, cy, 18, 8, 0, 0, Math.PI * 2);
+        ctx.ellipse(cx, cy + 2, 20, 6, 0, 0, Math.PI * 2);
         ctx.fill();
-        Utils.drawDoodleLine(ctx, cx - 18, cy, cx + 18, cy, '#6A1B9A', 2, 2);
-
-        // 驾驶舱
-        ctx.fillStyle = '#E1BEE7';
+        Utils.drawDoodleLine(ctx, cx - 20, cy + 2, cx + 20, cy + 2, '#6A1B9A', 2, 2);
+        ctx.fillStyle = '#CE93D8';
         ctx.beginPath();
-        ctx.arc(cx, cy - 5, 8, Math.PI, 0);
+        ctx.ellipse(cx, cy - 1, 10, 9, 0, Math.PI, 0);
         ctx.closePath();
         ctx.fill();
-        Utils.drawDoodleLine(ctx, cx - 8, cy - 5, cx - 8, cy - 12, '#6A1B9A', 2, 2);
-        Utils.drawDoodleLine(ctx, cx + 8, cy - 5, cx + 8, cy - 12, '#6A1B9A', 2, 2);
-        Utils.drawDoodleCircle(ctx, cx, cy - 9, 8, '#6A1B9A', 2, 2);
-
-        // 灯光
+        Utils.drawDoodleLine(ctx, cx - 10, cy - 1, cx + 10, cy - 1, '#6A1B9A', 2, 2);
+        Utils.drawDoodleCircle(ctx, cx, cy - 5, 9, '#6A1B9A', 2, 2);
         ctx.fillStyle = '#FFEB3B';
-        ctx.fillRect(cx - 10, cy + 2, 4, 4);
-        ctx.fillRect(cx + 6, cy + 2, 4, 4);
+        ctx.beginPath();
+        ctx.arc(cx - 8, cy + 5, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#FF5722';
+        ctx.beginPath();
+        ctx.arc(cx, cy + 5, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#4CAF50';
+        ctx.beginPath();
+        ctx.arc(cx + 8, cy + 5, 2.5, 0, Math.PI * 2);
+        ctx.fill();
         ctx.restore();
     }
 
     // ─── 绘制小怪物 ───
     function drawMonster(ctx, cx, cy) {
         ctx.save();
-        // 身体（绿色椭圆）
         ctx.fillStyle = '#8BC34A';
         ctx.beginPath();
         ctx.ellipse(cx, cy, 14, 12, 0, 0, Math.PI * 2);
         ctx.fill();
         Utils.drawDoodleCircle(ctx, cx, cy, 14, '#558B2F', 2, 2);
-
-        // 眼睛（大且凶）
         ctx.fillStyle = '#FFF';
         ctx.beginPath();
         ctx.ellipse(cx - 5, cy - 3, 5, 6, 0, 0, Math.PI * 2);
@@ -155,7 +156,8 @@ const Obstacles = (function () {
         ctx.beginPath();
         ctx.ellipse(cx + 5, cy - 3, 5, 6, 0, 0, Math.PI * 2);
         ctx.fill();
-
+        Utils.drawDoodleCircle(ctx, cx - 5, cy - 3, 5, '#558B2F', 1.5, 2);
+        Utils.drawDoodleCircle(ctx, cx + 5, cy - 3, 5, '#558B2F', 1.5, 2);
         ctx.fillStyle = '#F44336';
         ctx.beginPath();
         ctx.arc(cx - 5, cy - 3, 2.5, 0, Math.PI * 2);
@@ -163,8 +165,8 @@ const Obstacles = (function () {
         ctx.beginPath();
         ctx.arc(cx + 5, cy - 3, 2.5, 0, Math.PI * 2);
         ctx.fill();
-
-        // 尖牙
+        Utils.drawDoodleLine(ctx, cx - 9, cy - 9, cx - 3, cy - 7, '#558B2F', 2, 2);
+        Utils.drawDoodleLine(ctx, cx + 9, cy - 9, cx + 3, cy - 7, '#558B2F', 2, 2);
         ctx.fillStyle = '#FFF';
         ctx.beginPath();
         ctx.moveTo(cx - 6, cy + 6);
@@ -174,27 +176,24 @@ const Obstacles = (function () {
         ctx.lineTo(cx + 6, cy + 6);
         ctx.closePath();
         ctx.fill();
+        Utils.drawDoodleLine(ctx, cx - 6, cy + 6, cx - 3, cy + 10, '#558B2F', 1.5, 2);
+        Utils.drawDoodleLine(ctx, cx, cy + 6, cx + 3, cy + 10, '#558B2F', 1.5, 2);
         ctx.restore();
     }
 
     // ─── 绘制黑洞 ───
     function drawBlackHole(ctx, cx, cy, wobble) {
         ctx.save();
-        // 外圈（紫色漩涡）
         const r = 16 + Math.sin(wobble) * 2;
         ctx.fillStyle = '#4A148C';
         ctx.beginPath();
         ctx.arc(cx, cy, r, 0, Math.PI * 2);
         ctx.fill();
         Utils.drawDoodleCircle(ctx, cx, cy, r, '#7B1FA2', 2, 2);
-
-        // 内圈（黑色核心）
         ctx.fillStyle = '#000';
         ctx.beginPath();
         ctx.arc(cx, cy, 8, 0, Math.PI * 2);
         ctx.fill();
-
-        // 吸积盘（旋转的白色小点）
         ctx.fillStyle = '#E1BEE7';
         for (let i = 0; i < 6; i++) {
             const a = (i / 6) * Math.PI * 2 + wobble;
@@ -209,15 +208,12 @@ const Obstacles = (function () {
     // ─── 绘制炮台 ───
     function drawTurret(ctx, cx, cy, shootTimer, shootInterval) {
         ctx.save();
-        // 底座
         ctx.fillStyle = '#546E7A';
         ctx.fillRect(cx - 12, cy + 6, 24, 10);
         Utils.drawDoodleLine(ctx, cx - 12, cy + 6, cx + 12, cy + 6, '#37474F', 2, 2);
         Utils.drawDoodleLine(ctx, cx + 12, cy + 6, cx + 12, cy + 16, '#37474F', 2, 2);
         Utils.drawDoodleLine(ctx, cx + 12, cy + 16, cx - 12, cy + 16, '#37474F', 2, 2);
         Utils.drawDoodleLine(ctx, cx - 12, cy + 16, cx - 12, cy + 6, '#37474F', 2, 2);
-
-        // 炮管（根据射击倒计时改变颜色）
         const charge = 1 - (shootTimer / shootInterval);
         const barrelColor = charge > 0.7 ? '#FF5722' : '#78909C';
         ctx.fillStyle = barrelColor;
@@ -226,10 +222,14 @@ const Obstacles = (function () {
         Utils.drawDoodleLine(ctx, cx + 4, cy - 8, cx + 4, cy + 6, '#37474F', 2, 2);
         Utils.drawDoodleLine(ctx, cx + 4, cy + 6, cx - 4, cy + 6, '#37474F', 2, 2);
         Utils.drawDoodleLine(ctx, cx - 4, cy + 6, cx - 4, cy - 8, '#37474F', 2, 2);
-
-        // 炮口
         ctx.fillStyle = '#263238';
         ctx.fillRect(cx - 2, cy - 12, 4, 4);
+        if (charge > 0.7) {
+            ctx.fillStyle = '#FF9800';
+            ctx.beginPath();
+            ctx.arc(cx, cy - 12, 3, 0, Math.PI * 2);
+            ctx.fill();
+        }
         ctx.restore();
     }
 

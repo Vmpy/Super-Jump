@@ -83,16 +83,22 @@ const Items = (function () {
     // ─── 绘制各道具 ───
     function drawSpring(ctx, cx, cy) {
         ctx.save();
+        ctx.fillStyle = '#B0BEC5';
+        ctx.fillRect(cx - 7, cy + 6, 14, 3);
+        ctx.fillRect(cx - 7, cy - 9, 14, 3);
+        Utils.drawDoodleLine(ctx, cx - 7, cy + 6, cx + 7, cy + 6, '#78909C', 1.5, 2);
+        Utils.drawDoodleLine(ctx, cx - 7, cy - 9, cx + 7, cy - 9, '#78909C', 1.5, 2);
         ctx.strokeStyle = '#FF9800';
-        ctx.lineWidth = 3;
+        ctx.lineWidth = 2.5;
         ctx.lineCap = 'round';
+        const coils = 4;
+        const coilH = 12;
+        const topY = cy - 6;
         ctx.beginPath();
-        const coils = 3;
-        const coilH = 16;
-        for (let i = 0; i <= coils * 4; i++) {
-            const t = i / (coils * 4);
-            const x = cx + Math.sin(t * Math.PI * coils * 2) * 5;
-            const y = cy - coilH / 2 + t * coilH;
+        for (let i = 0; i <= coils * 2; i++) {
+            const t = i / (coils * 2);
+            const x = cx + (i % 2 === 0 ? -5 : 5);
+            const y = topY + t * coilH;
             if (i === 0) ctx.moveTo(x, y);
             else ctx.lineTo(x, y);
         }
@@ -102,30 +108,53 @@ const Items = (function () {
 
     function drawRocket(ctx, cx, cy) {
         ctx.save();
-        // 火箭身体
-        ctx.fillStyle = '#F44336';
+        ctx.fillStyle = '#ECEFF1';
         ctx.beginPath();
-        ctx.moveTo(cx, cy - 10);
-        ctx.lineTo(cx - 6, cy + 8);
-        ctx.lineTo(cx + 6, cy + 8);
+        ctx.moveTo(cx, cy - 12);
+        ctx.lineTo(cx + 6, cy + 6);
+        ctx.lineTo(cx - 6, cy + 6);
         ctx.closePath();
         ctx.fill();
-        Utils.drawDoodleLine(ctx, cx, cy - 10, cx - 6, cy + 8, '#B71C1C', 2, 2);
-        Utils.drawDoodleLine(ctx, cx - 6, cy + 8, cx + 6, cy + 8, '#B71C1C', 2, 2);
-        Utils.drawDoodleLine(ctx, cx + 6, cy + 8, cx, cy - 10, '#B71C1C', 2, 2);
-
-        // 窗口
-        ctx.fillStyle = '#FFF';
+        Utils.drawDoodleLine(ctx, cx - 6, cy + 6, cx, cy - 12, '#B71C1C', 2, 2);
+        Utils.drawDoodleLine(ctx, cx, cy - 12, cx + 6, cy + 6, '#B71C1C', 2, 2);
+        Utils.drawDoodleLine(ctx, cx - 6, cy + 6, cx + 6, cy + 6, '#B71C1C', 2, 2);
+        ctx.fillStyle = '#F44336';
+        ctx.beginPath();
+        ctx.moveTo(cx, cy - 12);
+        ctx.lineTo(cx + 2, cy - 5);
+        ctx.lineTo(cx - 2, cy - 5);
+        ctx.closePath();
+        ctx.fill();
+        ctx.fillStyle = '#F44336';
+        ctx.beginPath();
+        ctx.moveTo(cx - 6, cy + 2);
+        ctx.lineTo(cx - 10, cy + 8);
+        ctx.lineTo(cx - 4, cy + 6);
+        ctx.closePath();
+        ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(cx + 6, cy + 2);
+        ctx.lineTo(cx + 10, cy + 8);
+        ctx.lineTo(cx + 4, cy + 6);
+        ctx.closePath();
+        ctx.fill();
+        ctx.fillStyle = '#81D4FA';
         ctx.beginPath();
         ctx.arc(cx, cy - 2, 3, 0, Math.PI * 2);
         ctx.fill();
-
-        // 尾焰
+        Utils.drawDoodleCircle(ctx, cx, cy - 2, 3, '#0277BD', 1.5, 2);
         ctx.fillStyle = '#FF9800';
         ctx.beginPath();
-        ctx.moveTo(cx - 4, cy + 8);
+        ctx.moveTo(cx - 4, cy + 6);
         ctx.lineTo(cx, cy + 14);
-        ctx.lineTo(cx + 4, cy + 8);
+        ctx.lineTo(cx + 4, cy + 6);
+        ctx.closePath();
+        ctx.fill();
+        ctx.fillStyle = '#FFEB3B';
+        ctx.beginPath();
+        ctx.moveTo(cx - 2, cy + 6);
+        ctx.lineTo(cx, cy + 11);
+        ctx.lineTo(cx + 2, cy + 6);
         ctx.closePath();
         ctx.fill();
         ctx.restore();
@@ -133,26 +162,27 @@ const Items = (function () {
 
     function drawShield(ctx, cx, cy) {
         ctx.save();
-        ctx.fillStyle = 'rgba(0, 229, 255, 0.2)';
-        ctx.strokeStyle = '#00E5FF';
-        ctx.lineWidth = 2;
+        ctx.fillStyle = 'rgba(0, 229, 255, 0.15)';
         ctx.beginPath();
-        ctx.arc(cx, cy, 10, 0, Math.PI * 2);
+        ctx.arc(cx, cy, 11, 0, Math.PI * 2);
         ctx.fill();
-        Utils.drawDoodleCircle(ctx, cx, cy, 10, '#00E5FF', 2, 2);
-
-        // 盾牌图案
-        ctx.strokeStyle = '#00E5FF';
-        ctx.lineWidth = 1.5;
+        Utils.drawDoodleCircle(ctx, cx, cy, 11, '#00E5FF', 2, 2);
+        ctx.fillStyle = '#00BCD4';
         ctx.beginPath();
-        ctx.moveTo(cx, cy - 6);
-        ctx.lineTo(cx + 5, cy - 3);
-        ctx.lineTo(cx + 5, cy + 2);
-        ctx.lineTo(cx, cy + 6);
-        ctx.lineTo(cx - 5, cy + 2);
-        ctx.lineTo(cx - 5, cy - 3);
+        ctx.moveTo(cx, cy - 8);
+        ctx.lineTo(cx + 7, cy - 4);
+        ctx.lineTo(cx + 7, cy + 2);
+        ctx.lineTo(cx, cy + 9);
+        ctx.lineTo(cx - 7, cy + 2);
+        ctx.lineTo(cx - 7, cy - 4);
         ctx.closePath();
-        ctx.stroke();
+        ctx.fill();
+        Utils.drawDoodleLine(ctx, cx, cy - 8, cx + 7, cy - 4, '#006064', 1.5, 2);
+        Utils.drawDoodleLine(ctx, cx + 7, cy - 4, cx + 7, cy + 2, '#006064', 1.5, 2);
+        Utils.drawDoodleLine(ctx, cx + 7, cy + 2, cx, cy + 9, '#006064', 1.5, 2);
+        Utils.drawDoodleLine(ctx, cx, cy + 9, cx - 7, cy + 2, '#006064', 1.5, 2);
+        Utils.drawDoodleLine(ctx, cx - 7, cy + 2, cx - 7, cy - 4, '#006064', 1.5, 2);
+        Utils.drawDoodleLine(ctx, cx - 7, cy - 4, cx, cy - 8, '#006064', 1.5, 2);
         ctx.restore();
     }
 
@@ -163,7 +193,6 @@ const Items = (function () {
         ctx.arc(cx, cy, 8, 0, Math.PI * 2);
         ctx.fill();
         Utils.drawDoodleCircle(ctx, cx, cy, 8, '#F57F17', 2, 2);
-
         ctx.fillStyle = '#F57F17';
         ctx.font = 'bold 10px sans-serif';
         ctx.textAlign = 'center';
@@ -175,32 +204,35 @@ const Items = (function () {
     // ─── 磁铁 ───
     function drawMagnet(ctx, cx, cy) {
         ctx.save();
-        // 马蹄形
         ctx.fillStyle = '#F44336';
         ctx.beginPath();
-        ctx.arc(cx - 4, cy - 2, 5, Math.PI, 0);
-        ctx.lineTo(cx + 1, cy + 6);
-        ctx.arc(cx + 4, cy - 2, 5, 0, Math.PI, true);
+        ctx.arc(cx, cy - 2, 8, Math.PI, 0);
+        ctx.lineTo(cx + 8, cy + 5);
+        ctx.lineTo(cx + 4, cy + 5);
+        ctx.lineTo(cx + 4, cy - 2);
+        ctx.arc(cx, cy - 2, 4, 0, Math.PI, true);
+        ctx.lineTo(cx - 4, cy + 5);
+        ctx.lineTo(cx - 8, cy + 5);
         ctx.closePath();
         ctx.fill();
-        Utils.drawDoodleLine(ctx, cx - 9, cy - 2, cx + 9, cy - 2, '#B71C1C', 2, 2);
-        Utils.drawDoodleLine(ctx, cx - 9, cy - 2, cx - 9, cy + 4, '#B71C1C', 2, 2);
-        Utils.drawDoodleLine(ctx, cx + 9, cy - 2, cx + 9, cy + 4, '#B71C1C', 2, 2);
-        // 磁力线
-        ctx.fillStyle = '#03A9F4';
-        ctx.fillRect(cx - 6, cy + 6, 3, 3);
-        ctx.fillRect(cx + 3, cy + 6, 3, 3);
-        ctx.fillRect(cx - 1, cy + 9, 2, 2);
+        Utils.drawDoodleLine(ctx, cx - 8, cy - 2, cx + 8, cy - 2, '#B71C1C', 1.5, 2);
+        ctx.fillStyle = '#1565C0';
+        ctx.fillRect(cx - 8, cy + 5, 4, 4);
+        ctx.fillRect(cx + 4, cy + 5, 4, 4);
+        Utils.drawDoodleLine(ctx, cx - 8, cy + 5, cx - 4, cy + 9, '#0D47A1', 1.5, 2);
+        Utils.drawDoodleLine(ctx, cx + 4, cy + 5, cx + 8, cy + 9, '#0D47A1', 1.5, 2);
+        Utils.drawDoodleLine(ctx, cx - 4, cy - 6, cx - 6, cy - 10, '#90CAF9', 1, 2);
+        Utils.drawDoodleLine(ctx, cx, cy - 8, cx, cy - 12, '#90CAF9', 1, 2);
+        Utils.drawDoodleLine(ctx, cx + 4, cy - 6, cx + 6, cy - 10, '#90CAF9', 1, 2);
         ctx.restore();
     }
 
     // ─── 双倍分数 ───
     function drawDoubleScore(ctx, cx, cy) {
         ctx.save();
-        // 星形背景
         ctx.fillStyle = '#FFEB3B';
         ctx.beginPath();
-        const spikes = 5, outer = 10, inner = 5;
+        const spikes = 5, outer = 11, inner = 5;
         for (let i = 0; i < spikes * 2; i++) {
             const r = i % 2 === 0 ? outer : inner;
             const a = (i / (spikes * 2)) * Math.PI * 2 - Math.PI / 2;
@@ -211,22 +243,20 @@ const Items = (function () {
         }
         ctx.closePath();
         ctx.fill();
-        Utils.drawDoodleLine(ctx, cx, cy - outer, cx + inner, cy - inner, '#F57F17', 1.5, 2);
         for (let i = 0; i < spikes * 2; i++) {
             const r = i % 2 === 0 ? outer : inner;
             const a = (i / (spikes * 2)) * Math.PI * 2 - Math.PI / 2;
             const x = cx + Math.cos(a) * r;
             const y = cy + Math.sin(a) * r;
-            if (i === 0) continue;
-            const pr = ((i - 1) % 2 === 0) ? outer : inner;
-            const pa = ((i - 1) / (spikes * 2)) * Math.PI * 2 - Math.PI / 2;
-            const px = cx + Math.cos(pa) * pr;
-            const py = cy + Math.sin(pa) * pr;
-            Utils.drawDoodleLine(ctx, px, py, x, y, '#F57F17', 1.5, 2);
+            const ni = (i + 1) % (spikes * 2);
+            const nr = ni % 2 === 0 ? outer : inner;
+            const na = (ni / (spikes * 2)) * Math.PI * 2 - Math.PI / 2;
+            const nx = cx + Math.cos(na) * nr;
+            const ny = cy + Math.sin(na) * nr;
+            Utils.drawDoodleLine(ctx, x, y, nx, ny, '#F57F17', 1.5, 2);
         }
-        // ×2 文字
         ctx.fillStyle = '#E65100';
-        ctx.font = 'bold 9px sans-serif';
+        ctx.font = 'bold 8px sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText('×2', cx, cy + 1);
@@ -236,44 +266,49 @@ const Items = (function () {
     // ─── 降落伞 ───
     function drawParachute(ctx, cx, cy) {
         ctx.save();
-        // 伞面
         ctx.fillStyle = '#4FC3F7';
         ctx.beginPath();
         ctx.arc(cx, cy - 4, 10, Math.PI, 0);
         ctx.closePath();
         ctx.fill();
         Utils.drawDoodleLine(ctx, cx - 10, cy - 4, cx + 10, cy - 4, '#0277BD', 2, 2);
-        // 伞绳
-        Utils.drawDoodleLine(ctx, cx - 8, cy - 4, cx - 3, cy + 6, '#0277BD', 1, 1);
-        Utils.drawDoodleLine(ctx, cx + 8, cy - 4, cx + 3, cy + 6, '#0277BD', 1, 1);
-        Utils.drawDoodleLine(ctx, cx, cy - 4, cx, cy + 6, '#0277BD', 1, 1);
-        // 小背包
+        Utils.drawDoodleLine(ctx, cx - 8, cy - 4, cx - 3, cy + 6, '#0277BD', 1, 2);
+        Utils.drawDoodleLine(ctx, cx + 8, cy - 4, cx + 3, cy + 6, '#0277BD', 1, 2);
+        Utils.drawDoodleLine(ctx, cx, cy - 4, cx, cy + 6, '#0277BD', 1, 2);
         ctx.fillStyle = '#0288D1';
         ctx.fillRect(cx - 3, cy + 4, 6, 5);
-        Utils.drawDoodleLine(ctx, cx - 3, cy + 4, cx + 3, cy + 4, '#01579B', 1, 1);
-        Utils.drawDoodleLine(ctx, cx + 3, cy + 4, cx + 3, cy + 9, '#01579B', 1, 1);
-        Utils.drawDoodleLine(ctx, cx + 3, cy + 9, cx - 3, cy + 9, '#01579B', 1, 1);
-        Utils.drawDoodleLine(ctx, cx - 3, cy + 9, cx - 3, cy + 4, '#01579B', 1, 1);
+        Utils.drawDoodleLine(ctx, cx - 3, cy + 4, cx + 3, cy + 4, '#01579B', 1, 2);
+        Utils.drawDoodleLine(ctx, cx + 3, cy + 4, cx + 3, cy + 9, '#01579B', 1, 2);
+        Utils.drawDoodleLine(ctx, cx + 3, cy + 9, cx - 3, cy + 9, '#01579B', 1, 2);
+        Utils.drawDoodleLine(ctx, cx - 3, cy + 9, cx - 3, cy + 4, '#01579B', 1, 2);
         ctx.restore();
     }
 
     // ─── 超级弹簧 ───
     function drawSuperSpring(ctx, cx, cy) {
         ctx.save();
+        ctx.fillStyle = '#FFD600';
+        ctx.fillRect(cx - 8, cy + 7, 16, 3);
+        ctx.fillRect(cx - 8, cy - 10, 16, 3);
+        Utils.drawDoodleLine(ctx, cx - 8, cy + 7, cx + 8, cy + 7, '#F9A825', 1.5, 2);
+        Utils.drawDoodleLine(ctx, cx - 8, cy - 10, cx + 8, cy - 10, '#F9A825', 1.5, 2);
         ctx.strokeStyle = '#F44336';
-        ctx.lineWidth = 4;
+        ctx.lineWidth = 3;
         ctx.lineCap = 'round';
+        const coils = 5;
+        const coilH = 14;
+        const topY = cy - 7;
         ctx.beginPath();
-        const coils = 4;
-        const coilH = 18;
-        for (let i = 0; i <= coils * 4; i++) {
-            const t = i / (coils * 4);
-            const x = cx + Math.sin(t * Math.PI * coils * 2) * 6;
-            const y = cy - coilH / 2 + t * coilH;
+        for (let i = 0; i <= coils * 2; i++) {
+            const t = i / (coils * 2);
+            const x = cx + (i % 2 === 0 ? -6 : 6);
+            const y = topY + t * coilH;
             if (i === 0) ctx.moveTo(x, y);
             else ctx.lineTo(x, y);
         }
         ctx.stroke();
+        Utils.drawDoodleLine(ctx, cx - 3, cy - 13, cx, cy - 16, '#FFEB3B', 2, 2);
+        Utils.drawDoodleLine(ctx, cx, cy - 16, cx + 3, cy - 13, '#FFEB3B', 2, 2);
         ctx.restore();
     }
 
@@ -285,18 +320,24 @@ const Items = (function () {
         ctx.arc(cx, cy, 9, 0, Math.PI * 2);
         ctx.fill();
         Utils.drawDoodleCircle(ctx, cx, cy, 9, '#7B1FA2', 2, 2);
-        // 向内箭头
         ctx.strokeStyle = '#FFF';
         ctx.lineWidth = 2;
+        ctx.lineCap = 'round';
         ctx.beginPath();
-        ctx.moveTo(cx - 4, cy - 4);
-        ctx.lineTo(cx, cy);
-        ctx.lineTo(cx + 4, cy - 4);
+        ctx.moveTo(cx - 5, cy - 5);
+        ctx.lineTo(cx - 2, cy - 2);
+        ctx.moveTo(cx - 5, cy - 5);
+        ctx.lineTo(cx - 2, cy - 5);
+        ctx.moveTo(cx - 5, cy - 5);
+        ctx.lineTo(cx - 5, cy - 2);
         ctx.stroke();
         ctx.beginPath();
-        ctx.moveTo(cx - 4, cy + 4);
-        ctx.lineTo(cx, cy);
-        ctx.lineTo(cx + 4, cy + 4);
+        ctx.moveTo(cx + 5, cy + 5);
+        ctx.lineTo(cx + 2, cy + 2);
+        ctx.moveTo(cx + 5, cy + 5);
+        ctx.lineTo(cx + 2, cy + 5);
+        ctx.moveTo(cx + 5, cy + 5);
+        ctx.lineTo(cx + 5, cy + 2);
         ctx.stroke();
         ctx.restore();
     }
@@ -309,80 +350,89 @@ const Items = (function () {
         ctx.arc(cx, cy, 9, 0, Math.PI * 2);
         ctx.fill();
         Utils.drawDoodleCircle(ctx, cx, cy, 9, '#00838F', 2, 2);
-        // 时钟指针
         ctx.strokeStyle = '#FFF';
         ctx.lineWidth = 2;
+        ctx.lineCap = 'round';
         ctx.beginPath();
-        ctx.moveTo(cx, cy - 4);
+        ctx.moveTo(cx, cy - 5);
         ctx.lineTo(cx, cy);
         ctx.lineTo(cx + 3, cy + 2);
         ctx.stroke();
         ctx.fillStyle = '#FFF';
-        ctx.font = 'bold 7px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('0.5x', cx, cy + 6);
+        ctx.beginPath();
+        ctx.arc(cx, cy, 1.5, 0, Math.PI * 2);
+        ctx.fill();
+        Utils.drawDoodleLine(ctx, cx, cy - 9, cx, cy - 7, '#FFF', 1, 1);
+        Utils.drawDoodleLine(ctx, cx + 9, cy, cx + 7, cy, '#FFF', 1, 1);
+        Utils.drawDoodleLine(ctx, cx, cy + 9, cx, cy + 7, '#FFF', 1, 1);
+        Utils.drawDoodleLine(ctx, cx - 9, cy, cx - 7, cy, '#FFF', 1, 1);
         ctx.restore();
     }
 
     // ─── 炸弹道具 ───
     function drawBomb(ctx, cx, cy) {
         ctx.save();
-        // 炸弹主体
         ctx.fillStyle = '#212121';
         ctx.beginPath();
         ctx.arc(cx, cy + 1, 8, 0, Math.PI * 2);
         ctx.fill();
         Utils.drawDoodleCircle(ctx, cx, cy + 1, 8, '#424242', 2, 2);
-        // 引线
-        ctx.strokeStyle = '#FF9800';
-        ctx.lineWidth = 2;
+        ctx.fillStyle = '#546E7A';
+        ctx.fillRect(cx - 2, cy - 8, 4, 3);
+        Utils.drawDoodleLine(ctx, cx, cy - 8, cx + 3, cy - 13, '#8D6E63', 2, 2);
+        ctx.fillStyle = '#FF9800';
         ctx.beginPath();
-        ctx.moveTo(cx, cy - 7);
-        ctx.lineTo(cx + 3, cy - 12);
-        ctx.stroke();
-        // 火花
+        ctx.arc(cx + 3, cy - 13, 3, 0, Math.PI * 2);
+        ctx.fill();
         ctx.fillStyle = '#FFEB3B';
         ctx.beginPath();
-        ctx.arc(cx + 3, cy - 12, 2, 0, Math.PI * 2);
+        ctx.arc(cx + 3, cy - 13, 1.5, 0, Math.PI * 2);
         ctx.fill();
+        Utils.drawDoodleLine(ctx, cx + 5, cy - 16, cx + 6, cy - 19, '#FFEB3B', 1.5, 2);
+        Utils.drawDoodleLine(ctx, cx + 1, cy - 16, cx, cy - 18, '#FFEB3B', 1.5, 2);
         ctx.restore();
     }
 
     // ─── 宇宙飞船道具 ───
     function drawShip(ctx, cx, cy) {
         ctx.save();
-        // 飞船主体
         ctx.fillStyle = '#607D8B';
         ctx.beginPath();
-        ctx.ellipse(cx, cy, 9, 6, 0, 0, Math.PI * 2);
+        ctx.moveTo(cx, cy - 10);
+        ctx.lineTo(cx + 9, cy + 4);
+        ctx.lineTo(cx - 9, cy + 4);
+        ctx.closePath();
         ctx.fill();
-        Utils.drawDoodleCircle(ctx, cx, cy, 9, '#455A64', 1.5, 2);
-        // 翅膀
+        Utils.drawDoodleLine(ctx, cx - 9, cy + 4, cx, cy - 10, '#455A64', 2, 2);
+        Utils.drawDoodleLine(ctx, cx, cy - 10, cx + 9, cy + 4, '#455A64', 2, 2);
+        Utils.drawDoodleLine(ctx, cx - 9, cy + 4, cx + 9, cy + 4, '#455A64', 2, 2);
         ctx.fillStyle = '#90A4AE';
         ctx.beginPath();
-        ctx.moveTo(cx - 8, cy + 3);
+        ctx.moveTo(cx - 7, cy + 2);
         ctx.lineTo(cx - 14, cy + 10);
-        ctx.lineTo(cx - 4, cy + 8);
+        ctx.lineTo(cx - 4, cy + 7);
         ctx.closePath();
         ctx.fill();
+        Utils.drawDoodleLine(ctx, cx - 7, cy + 2, cx - 14, cy + 10, '#607D8B', 1.5, 2);
+        Utils.drawDoodleLine(ctx, cx - 14, cy + 10, cx - 4, cy + 7, '#607D8B', 1.5, 2);
         ctx.beginPath();
-        ctx.moveTo(cx + 8, cy + 3);
+        ctx.moveTo(cx + 7, cy + 2);
         ctx.lineTo(cx + 14, cy + 10);
-        ctx.lineTo(cx + 4, cy + 8);
+        ctx.lineTo(cx + 4, cy + 7);
         ctx.closePath();
         ctx.fill();
-        // 驾驶舱
+        Utils.drawDoodleLine(ctx, cx + 7, cy + 2, cx + 14, cy + 10, '#607D8B', 1.5, 2);
+        Utils.drawDoodleLine(ctx, cx + 14, cy + 10, cx + 4, cy + 7, '#607D8B', 1.5, 2);
         ctx.fillStyle = '#81D4FA';
         ctx.beginPath();
         ctx.arc(cx, cy - 3, 3, 0, Math.PI * 2);
         ctx.fill();
-        // 尾焰
+        Utils.drawDoodleCircle(ctx, cx, cy - 3, 3, '#0288D1', 1.5, 2);
         ctx.fillStyle = '#FF9800';
         ctx.beginPath();
-        ctx.moveTo(cx - 3, cy + 6);
+        ctx.moveTo(cx - 3, cy + 4);
         ctx.lineTo(cx, cy + 12);
-        ctx.lineTo(cx + 3, cy + 6);
+        ctx.lineTo(cx + 3, cy + 4);
         ctx.closePath();
         ctx.fill();
         ctx.restore();
