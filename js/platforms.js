@@ -357,7 +357,10 @@ const Platforms = (function () {
         if (typeItem.type === 'portal') {
             const gap2 = BASE_GAP + difficulty * (MAX_GAP - BASE_GAP);
             const y2 = highestPlatformY - gap2;
-            const x2 = Utils.randomInt(20, canvasWidth - PLATFORM_WIDTH - 20);
+            let x2;
+            do {
+                x2 = Utils.randomInt(20, canvasWidth - PLATFORM_WIDTH - 20);
+            } while (Math.abs(x2 - x) < PLATFORM_WIDTH);
             const p2 = new Platform(x2, y2, 'portal');
             p.portalPair = p2;
             p2.portalPair = p;
