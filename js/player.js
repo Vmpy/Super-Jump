@@ -317,19 +317,21 @@ const Player = (function () {
         const screenY = player.y - camera.y;
         if (screenY < -100 || screenY > camera.screenHeight + 100) return;
 
-        const scaleX = player.width / PLAYER_WIDTH;
-        const scaleY = player.height / PLAYER_HEIGHT;
+        if (!player.isShiping) {
+            const scaleX = player.width / PLAYER_WIDTH;
+            const scaleY = player.height / PLAYER_HEIGHT;
 
-        if (scaleX < 1 || scaleY < 1) {
-            ctx.save();
-            const feetX = player.x + player.width / 2;
-            const feetY = screenY + player.height;
-            ctx.translate(feetX, feetY);
-            ctx.scale(scaleX, scaleY);
-            Utils.drawDoodlePlayer(ctx, -PLAYER_WIDTH / 2, -PLAYER_HEIGHT, PLAYER_WIDTH, PLAYER_HEIGHT, player.facingRight);
-            ctx.restore();
-        } else {
-            Utils.drawDoodlePlayer(ctx, player.x, screenY, player.width, player.height, player.facingRight);
+            if (scaleX < 1 || scaleY < 1) {
+                ctx.save();
+                const feetX = player.x + player.width / 2;
+                const feetY = screenY + player.height;
+                ctx.translate(feetX, feetY);
+                ctx.scale(scaleX, scaleY);
+                Utils.drawDoodlePlayer(ctx, -PLAYER_WIDTH / 2, -PLAYER_HEIGHT, PLAYER_WIDTH, PLAYER_HEIGHT, player.facingRight);
+                ctx.restore();
+            } else {
+                Utils.drawDoodlePlayer(ctx, player.x, screenY, player.width, player.height, player.facingRight);
+            }
         }
 
         // 绘制护盾效果
@@ -384,6 +386,9 @@ const Player = (function () {
             ctx.save();
             const shipCx = player.x + player.width / 2;
             const shipCy = screenY + player.height / 2;
+            ctx.translate(shipCx, shipCy);
+            ctx.scale(1.6, 1.6);
+            ctx.translate(-shipCx, -shipCy);
             ctx.fillStyle = '#607D8B';
             ctx.beginPath();
             ctx.moveTo(shipCx, shipCy - 18);
@@ -416,11 +421,13 @@ const Player = (function () {
             ctx.arc(shipCx, shipCy - 8, 4, 0, Math.PI * 2);
             ctx.fill();
             Utils.drawDoodleCircle(ctx, shipCx, shipCy - 8, 4, '#0288D1', 1.5, 2);
+            ctx.restore();
+            ctx.save();
             const flameCount = 5;
             for (let i = 0; i < flameCount; i++) {
-                const fx = shipCx + Utils.random(-6, 6);
-                const fy = screenY + player.height + Utils.random(5, 25);
-                const fsize = Utils.random(3, 9);
+                const fx = shipCx + Utils.random(-8, 8);
+                const fy = screenY + player.height + Utils.random(5, 30);
+                const fsize = Utils.random(4, 10);
                 ctx.fillStyle = Utils.randomInt(0, 1) ? '#FF5722' : '#FFEB3B';
                 ctx.fillRect(fx - fsize / 2, fy - fsize / 2, fsize, fsize);
             }
