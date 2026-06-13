@@ -85,6 +85,9 @@ const Game = (function () {
         Obstacles.clear();
         Particles.clear();
         Items.clear();
+
+        // 初始化风力
+        Wind.init();
     }
 
     function restartGame() {
@@ -250,6 +253,9 @@ const Game = (function () {
 
         // 更新背景云层
         Background.update(dt, Camera.get());
+
+        // 更新风力
+        Wind.update(dt, player.y);
 
         // 更新相机
         Camera.update(player);

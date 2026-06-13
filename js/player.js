@@ -126,7 +126,7 @@ const Player = (function () {
             player.vx = 0;
         }
 
-        player.x += player.vx * dt;
+        player.x += (player.vx + Wind.getForce()) * dt;
 
         // ─── 穿墙效果 ───
         if (player.x + player.width < 0) {

@@ -96,7 +96,8 @@ const I18n = (function () {
             statusShrink: '缩',
             statusSlowMo: '缓',
             statusShip: '船',
-            statusSpeed: '速'
+            statusSpeed: '速',
+            windWarning: '注意风力'
         },
         en: {
             gameTitle: 'SuperJump',
@@ -186,7 +187,8 @@ const I18n = (function () {
             statusShrink: 'S',
             statusSlowMo: 'SM',
             statusShip: 'SH',
-            statusSpeed: 'SP'
+            statusSpeed: 'SP',
+            windWarning: 'Watch wind'
         }
     };
 

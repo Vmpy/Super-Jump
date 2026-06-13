@@ -169,6 +169,43 @@ const Renderer = (function () {
             }
         }
 
+        // 风力指示器
+        if (Wind.isActive()) {
+            const windDir = Wind.getDirection();
+            const windStr = Wind.getStrength();
+            const indicatorX = logicalWidth - 40;
+            const indicatorY = 50;
+            const arrowLen = 15 + (windStr / 120) * 15;
+
+            ctx.save();
+            ctx.strokeStyle = '#2196F3';
+            ctx.lineWidth = 3;
+            ctx.lineCap = 'round';
+
+            // 箭头主线
+            ctx.beginPath();
+            ctx.moveTo(indicatorX - windDir * arrowLen / 2, indicatorY);
+            ctx.lineTo(indicatorX + windDir * arrowLen / 2, indicatorY);
+            ctx.stroke();
+
+            // 箭头头部
+            ctx.beginPath();
+            ctx.moveTo(indicatorX + windDir * arrowLen / 2, indicatorY);
+            ctx.lineTo(indicatorX + windDir * (arrowLen / 2 - 6), indicatorY - 5);
+            ctx.moveTo(indicatorX + windDir * arrowLen / 2, indicatorY);
+            ctx.lineTo(indicatorX + windDir * (arrowLen / 2 - 6), indicatorY + 5);
+            ctx.stroke();
+
+            // 风力强度条
+            ctx.fillStyle = 'rgba(33, 150, 243, 0.3)';
+            ctx.fillRect(indicatorX - 20, indicatorY + 10, 40, 6);
+            ctx.fillStyle = '#2196F3';
+            const barWidth = (windStr / 120) * 40;
+            ctx.fillRect(indicatorX - 20, indicatorY + 10, barWidth, 6);
+
+            ctx.restore();
+        }
+
         // 暂停提示
         if (isPaused) {
             ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';

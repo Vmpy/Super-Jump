@@ -6,6 +6,7 @@
 const Background = (function () {
     const GRID_SPACING = 30;
     let clouds = [];
+    let windStreaks = [];
 
     function init() {
         clouds = [];
@@ -15,7 +16,17 @@ const Background = (function () {
                 y: Utils.random(-2000, 600),
                 size: Utils.random(30, 60),
                 speed: Utils.random(5, 15),
-                layer: Utils.randomInt(1, 3) // 1=远 2=中 3=近
+                layer: Utils.randomInt(1, 3)
+            });
+        }
+        windStreaks = [];
+        for (let i = 0; i < 20; i++) {
+            windStreaks.push({
+                x: Utils.random(0, 400),
+                y: Utils.random(0, 600),
+                len: Utils.random(20, 50),
+                speed: Utils.random(100, 200),
+                alpha: Utils.random(0.1, 0.3)
             });
         }
     }
@@ -86,6 +97,24 @@ const Background = (function () {
                 cloud.y = camera.y + Utils.random(-100, camera.screenHeight + 100);
             }
         }
+
+        // 更新风纹
+        if (Wind.isActive()) {
+            const windDir = Wind.getDirection();
+            const windStr = Wind.getStrength();
+            for (const streak of windStreaks) {
+                streak.x += windDir * streak.speed * (windStr / 120) * dt;
+
+                // 循环
+                if (windDir > 0 && streak.x > camera.screenWidth + streak.len) {
+                    streak.x = -streak.len;
+                    streak.y = Utils.random(0, camera.screenHeight);
+                } else if (windDir < 0 && streak.x + streak.len < -streak.len) {
+                    streak.x = camera.screenWidth + streak.len;
+                    streak.y = Utils.random(0, camera.screenHeight);
+                }
+            }
+        }
     }
 
     // ─── 绘制背景 ───
@@ -103,6 +132,24 @@ const Background = (function () {
             if (parallaxY > -100 && parallaxY < camera.screenHeight + 100) {
                 drawCloud(ctx, cloud.x, parallaxY, cloud.size);
             }
+        }
+
+        // 4. 风纹效果
+        if (Wind.isActive()) {
+            const windDir = Wind.getDirection();
+            const windStr = Wind.getStrength();
+            ctx.save();
+            ctx.strokeStyle = '#90CAF9';
+            ctx.lineWidth = 1;
+
+            for (const streak of windStreaks) {
+                ctx.globalAlpha = streak.alpha * (windStr / 120);
+                ctx.beginPath();
+                ctx.moveTo(streak.x, streak.y);
+                ctx.lineTo(streak.x + windDir * streak.len, streak.y);
+                ctx.stroke();
+            }
+            ctx.restore();
         }
     }
 
